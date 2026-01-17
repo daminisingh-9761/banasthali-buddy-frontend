@@ -75,32 +75,32 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: double.infinity,
                 height: 45,
                 child: ElevatedButton(
-                  onPressed: () async {
-                    // 🔹 STEP 4 (added): login integration
-                    setState(() => isLoading = true);
+                    onPressed: () async {
+              print("🔵 LOGIN BUTTON CLICKED");
 
-                    final success = await apiService.login(
-                      emailController.text,
-                      passwordController.text,
-                    );
+              setState(() => isLoading = true);
 
-                    setState(() => isLoading = false);
+              final success = await apiService.login(
+              emailController.text.trim(),
+              passwordController.text.trim(),
+              );
 
-                    if (success) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const HomeScreen(),
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Invalid email or password"),
-                        ),
-                      );
-                    }
-                  },
+              print("🟢 LOGIN RESULT: $success");
+
+              if (!mounted) return;
+              setState(() => isLoading = false);
+
+              if (success) {
+              Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+              );
+              } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Login failed")),
+              );
+              }
+              },
                   child: isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
                       : const Text("Login"),

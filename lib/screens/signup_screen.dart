@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
+import 'login_screen.dart';
 import '../services/api_service.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -35,11 +35,12 @@ class _SignupScreenState extends State<SignupScreen> {
 
                 /// Name
                 TextFormField(
-                  controller: nameController, // ✅ added
+                  controller: nameController, // 🔥 THIS MUST BE PRESENT
                   decoration: const InputDecoration(
                     labelText: "Full Name",
                   ),
                 ),
+
 
                 const SizedBox(height: 15),
 
@@ -80,20 +81,24 @@ class _SignupScreenState extends State<SignupScreen> {
 
                       setState(() => isLoading = false);
                       if (!mounted) return;
+                      if (nameController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Username is required")),
+                        );
+                        return;
+                      }
 
                       if (success) {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
-                          ),
+                          MaterialPageRoute(builder: (_) => LoginScreen()),
                         );
-                      } else {
+                      }
+                      else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Signup failed"),
-                          ),
+                          const SnackBar(content: Text("Signup successful. Please login.")),
                         );
+
                       }
                     },
                     child: isLoading

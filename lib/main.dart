@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screens/splash_screen.dart';
+import 'dart:io';
+import 'services/http_override.dart';
 
 void main() {
+  HttpOverrides.global = MyHttpOverrides(); // 🔥 THIS LINE
   runApp(const MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
