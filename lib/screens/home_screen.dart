@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'student_exchange_screen.dart';
 import 'erickshaw_booking_screen.dart';
 import 'bus_tracking_screen.dart';
-import '../services/booking_service.dart';
 import 'settings_screen.dart';
 import 'package:animated_background/animated_background.dart';
 
@@ -23,285 +22,561 @@ class _HomeScreenState extends State<HomeScreen>
     required String imagePath,
     required VoidCallback onTap,
   }) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(30),
-          splashColor: Colors.white24,
-          highlightColor: Colors.transparent,
-          onTap: onTap,
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
+
+      child: InkWell(
+        borderRadius: BorderRadius.circular(30),
+        onTap: onTap,
+
+        child: Container(
+
+          padding: const EdgeInsets.all(18),
+
+          decoration: BoxDecoration(
+
+            color: Colors.white.withOpacity(0.9),
+
+            borderRadius: BorderRadius.circular(30),
+
+            border: Border.all(
+              color: Colors.white.withOpacity(0.6),
+            ),
+
+            boxShadow: [
+
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 25,
+                offset: const Offset(0,10),
+              ),
+
+              BoxShadow(
+                color: Colors.white.withOpacity(0.9),
+                blurRadius: 10,
+                offset: const Offset(-4,-4),
+              ),
+
+            ],
+
+          ),
+
           child: Row(
+
             children: [
 
-              /// LEFT CIRCLE IMAGE
               Container(
-                width: 75,
-                height: 75,
+
+                width: 70,
+                height: 70,
+
                 decoration: BoxDecoration(
+
                   shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: AssetImage(imagePath),
-                    fit: BoxFit.cover,
+
+                  gradient: const LinearGradient(
+
+                    colors: [
+                      Color(0xFFE6F4F1),
+                      Colors.white
+                    ],
+
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+
                   ),
+
                   boxShadow: [
+
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.18),
-                      blurRadius: 8,
-                      offset: const Offset(0,4),
+                      color: const Color(0xFF2F6F6D)
+                          .withOpacity(0.15),
+                      blurRadius: 15,
+                      offset: const Offset(0,6),
                     )
+
                   ],
+
                 ),
+
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+
+                  child: Image.asset(
+                    imagePath,
+                    fit: BoxFit.contain,
+                  ),
+
+                ),
+
               ),
 
-              const SizedBox(width: 20),
+              const SizedBox(width: 18),
 
-              /// GREEN BUTTON
               Expanded(
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeInOut,
 
-                  constraints: const BoxConstraints(
-                    minHeight: 55,
-                    maxHeight: 70,
-                  ),
+                child: Column(
 
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
+                  crossAxisAlignment:
+                  CrossAxisAlignment.start,
 
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2F6F6D),
-                    borderRadius: BorderRadius.circular(20),
+                  children: [
 
-                    /// FLOATING SHADOW
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0,4),
-                      )
-                    ],
-                  ),
+                    Text(
 
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
+                      title,
 
-                      /// TEXT
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
+                      style: const TextStyle(
 
-                          Text(
-                            title,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                        fontSize: 18,
 
-                          const SizedBox(height: 2),
+                        fontWeight: FontWeight.bold,
 
-                          Text(
-                            subtitle,
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 12,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                        letterSpacing: 0.4,
+
                       ),
 
-                      /// ARROW ICON
-                      const Icon(
-                        Icons.arrow_forward_ios,
-                        color: Colors.white,
-                        size: 16,
+                    ),
+
+                    const SizedBox(height: 5),
+
+                    Text(
+
+                      subtitle,
+
+                      style: TextStyle(
+
+                        fontSize: 13,
+
+                        color: Colors.grey.shade600,
+
                       ),
-                    ],
-                  ),
+
+                    ),
+
+                  ],
+
                 ),
+
               ),
+
+              Container(
+
+                padding: const EdgeInsets.all(10),
+
+                decoration: BoxDecoration(
+
+                  color: const Color(0xFF2F6F6D),
+
+                  borderRadius:
+                  BorderRadius.circular(16),
+
+                  boxShadow: [
+
+                    BoxShadow(
+                      color: const Color(0xFF2F6F6D)
+                          .withOpacity(0.4),
+                      blurRadius: 12,
+                      offset: const Offset(0,6),
+                    )
+
+                  ],
+
+                ),
+
+                child: const Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.white,
+                  size: 16,
+                ),
+
+              ),
+
             ],
+
           ),
+
         ),
+
       ),
+
     );
+
   }
 
   @override
   Widget build(BuildContext context) {
 
-    final height = MediaQuery.of(context).size.height;
+    final height =
+        MediaQuery.of(context).size.height;
 
     return Scaffold(
+
       body: Stack(
+
         children: [
 
-          /// ANIMATED HEADER
-          AnimatedBackground(
-            behaviour: RandomParticleBehaviour(
-              options: ParticleOptions(
-                baseColor: Colors.white,
-                spawnOpacity: 0.08,
-                opacityChangeRate: 0.25,
-                minOpacity: 0.05,
-                maxOpacity: 0.12,
-                spawnMinSpeed: 10,
-                spawnMaxSpeed: 20,
-                particleCount: 18,
-              ),
+          /// ✅ background image added
+          Positioned.fill(
+            child: Image.asset(
+              "assets/images/route.jpeg",
+              fit: BoxFit.cover,
             ),
+          ),
+
+          AnimatedBackground(
+
+            behaviour: RandomParticleBehaviour(
+
+              options: ParticleOptions(
+
+                baseColor: Colors.white,
+
+                spawnOpacity: 0.10,
+
+                opacityChangeRate: 0.25,
+
+                minOpacity: 0.05,
+
+                maxOpacity: 0.15,
+
+                spawnMinSpeed: 10,
+
+                spawnMaxSpeed: 25,
+
+                particleCount: 22,
+
+              ),
+
+            ),
+
             vsync: this,
+
             child: Container(
-              height: height * 0.35,
+
+              height: height * 0.30,
+
               decoration: const BoxDecoration(
+
                 gradient: LinearGradient(
+
                   colors: [
+
                     Color(0xFF2F6F6D),
                     Color(0xFF4A9C97),
+
                   ],
+
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
+
                 ),
+
               ),
 
               child: Stack(
+
                 children: [
 
-                  /// BACKGROUND IMAGE
                   Opacity(
-                    opacity: 0.25,
+
+                    opacity: 0.15,
+
                     child: Image.asset(
+
                       "assets/images/bg.png",
+
                       fit: BoxFit.cover,
+
                       width: double.infinity,
                       height: double.infinity,
+
                     ),
+
                   ),
 
-                  /// HEADER CONTENT
                   Padding(
-                    padding: const EdgeInsets.only(top: 70, left: 20, right: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                    padding: const EdgeInsets.only(
+                        top: 75,
+                        left: 24,
+                        right: 24
+                    ),
+
+                    child: Column(
+
+                      crossAxisAlignment:
+                      CrossAxisAlignment.start,
+
                       children: [
 
-                        IconButton(
-                          icon: const Icon(Icons.settings, color: Colors.white),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                const SettingsScreen(role: "student"),
+                        Row(
+
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+
+                          children: [
+
+                            const Text(
+
+                              "Banasthali Buddy",
+
+                              style: TextStyle(
+
+                                fontSize: 24,
+
+                                fontWeight: FontWeight.bold,
+
+                                color: Colors.white,
+
+                                letterSpacing: 1.2,
+
                               ),
-                            );
-                          },
+
+                            ),
+
+                            Container(
+
+                              decoration: BoxDecoration(
+
+                                color: Colors.white
+                                    .withOpacity(0.2),
+
+                                shape: BoxShape.circle,
+
+                              ),
+
+                              child: IconButton(
+
+                                icon: const Icon(
+                                    Icons.settings,
+                                    color: Colors.white
+                                ),
+
+                                onPressed: () {
+
+                                  Navigator.push(
+
+                                    context,
+
+                                    MaterialPageRoute(
+
+                                      builder: (_) =>
+                                      const SettingsScreen(
+                                          role: "student"
+                                      ),
+
+                                    ),
+
+                                  );
+
+                                },
+
+                              ),
+
+                            ),
+
+                          ],
+
                         ),
+
+                        const SizedBox(height: 22),
 
                         const Text(
-                          "Student Home Screen",
+
+                          "Welcome back 👋",
+
                           style: TextStyle(
+
                             fontSize: 24,
+
                             color: Colors.white,
+
                             fontWeight: FontWeight.bold,
+
                           ),
+
                         ),
 
-                        const SizedBox(width: 40),
+                        const SizedBox(height: 6),
+
+                        const Text(
+
+                          "Your campus services in one place",
+
+                          style: TextStyle(
+
+                            color: Colors.white70,
+
+                            fontSize: 15,
+
+                          ),
+
+                        ),
+
                       ],
+
                     ),
+
                   ),
+
                 ],
+
               ),
+
             ),
+
           ),
-          /// WHITE AREA
+
           Align(
+
             alignment: Alignment.bottomCenter,
+
             child: Container(
-              height: height * 0.75,
+
+              height: height * 0.72,
+
+              padding: const EdgeInsets.only(
+                  top: 30
+              ),
+
               decoration: BoxDecoration(
+
                 color: const Color(0xFFE6F4F1),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(40),
-                  topRight: Radius.circular(40),
-                ),
+
+                borderRadius: BorderRadius.zero,
 
                 boxShadow: [
+
                   BoxShadow(
+
                     color: Colors.black.withOpacity(0.15),
-                    blurRadius: 15,
-                    offset: const Offset(0,-5),
+
+                    blurRadius: 25,
+
+                    offset: const Offset(0,-10),
+
                   ),
+
                 ],
+
               ),
 
               child: Column(
+
                 children: [
 
                   buildSection(
-                    context: context,
-                    title: "Student Exchange Hub",
-                    subtitle: "Buy & sell items among students",
-                    imagePath: "assets/images/exchange.png",
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const StudentExchangeHome(),
-                        ),
-                      );
-                    },
-                  ),
 
-                  const Divider(height: 1),
+                    context: context,
+
+                    title:
+                    "Student Exchange Hub",
+
+                    subtitle:
+                    "Buy & sell easily",
+
+                    imagePath:
+                    "assets/images/exchange.png",
+
+                    onTap: () {
+
+                      Navigator.push(
+
+                        context,
+
+                        MaterialPageRoute(
+
+                          builder: (_) =>
+                          const StudentExchangeHome(),
+
+                        ),
+
+                      );
+
+                    },
+
+                  ),
 
                   buildSection(
-                    context: context,
-                    title: "Bus Tracking",
-                    subtitle: "Track campus buses in real time",
-                    imagePath: "assets/images/bus.png",
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const BusTrackingScreen(),
-                        ),
-                      );
-                    },
-                  ),
 
-                  const Divider(height: 1),
+                    context: context,
+
+                    title:
+                    "Bus Tracking",
+
+                    subtitle:
+                    "Live campus bus tracking",
+
+                    imagePath:
+                    "assets/images/bus.png",
+
+                    onTap: () {
+
+                      Navigator.push(
+
+                        context,
+
+                        MaterialPageRoute(
+
+                          builder: (_) =>
+                          const BusTrackingScreen(),
+
+                        ),
+
+                      );
+
+                    },
+
+                  ),
 
                   buildSection(
+
                     context: context,
-                    title: "E-Rickshaw Booking",
-                    subtitle: "Book e-rickshaw inside campus",
-                    imagePath: "assets/images/rickshaw.png",
+
+                    title:
+                    "E-Rickshaw Booking",
+
+                    subtitle:
+                    "Book ride instantly",
+
+                    imagePath:
+                    "assets/images/rickshaw.png",
+
                     onTap: () {
+
                       Navigator.push(
+
                         context,
+
                         MaterialPageRoute(
-                          builder: (_) => const ErickshawBookingScreen(),
+
+                          builder: (_) =>
+                          const ErickshawBookingScreen(),
+
                         ),
+
                       );
+
                     },
+
                   ),
+
                 ],
+
               ),
+
             ),
+
           ),
+
         ],
+
       ),
+
     );
+
   }
+
 }

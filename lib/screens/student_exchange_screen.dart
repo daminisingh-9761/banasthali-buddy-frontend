@@ -14,9 +14,9 @@ class StudentExchangeHome extends StatelessWidget {
       body: Stack(
         children: [
 
-          /// 🔵 TOP GRADIENT HEADER
+          /// PREMIUM HEADER
           Container(
-            height: height * 0.35,
+            height: height * 0.32,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -27,55 +27,84 @@ class StudentExchangeHome extends StatelessWidget {
                 end: Alignment.bottomRight,
               ),
             ),
+
             child: Padding(
-              padding: const EdgeInsets.only(top: 60, left: 10, right: 10),
+              padding: const EdgeInsets.only(
+                top: 65,
+                left: 18,
+                right: 18,
+              ),
+
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
-                  /// BACK BUTTON
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back,color: Colors.white),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                  Row(
+                    children: [
+
+                      IconButton(
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+
+                    ],
                   ),
 
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 5),
 
-                  const Center(
-                    child: Text(
-                      "Student Exchange Hub",
-                      style: TextStyle(
-                        fontSize: 24,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  const Text(
+                    "Student Exchange Hub",
+                    style: TextStyle(
+                      fontSize: 26,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
                     ),
                   ),
+
+                  const SizedBox(height: 6),
+
+                  const Text(
+                    "Buy & Sell items easily within campus",
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                    ),
+                  ),
+
                 ],
               ),
             ),
           ),
 
-          /// 🔵 WHITE SECTION
+          /// WHITE SECTION
           Align(
             alignment: Alignment.bottomCenter,
+
             child: Container(
-              height: height * 0.75,
-              padding: const EdgeInsets.all(25),
+              height: height * 0.72,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 25,
+                vertical: 30,
+              ),
 
               decoration: BoxDecoration(
                 color: const Color(0xFFE6F4F1),
+
                 borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(40),
-                  topRight: Radius.circular(40),
+                  topLeft: Radius.circular(35),
+                  topRight: Radius.circular(35),
                 ),
+
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
-                    blurRadius: 15,
-                    offset: const Offset(0, -5),
+                    color: Colors.black.withOpacity(0.12),
+                    blurRadius: 20,
+                    offset: const Offset(0, -8),
                   ),
                 ],
               ),
@@ -83,80 +112,172 @@ class StudentExchangeHome extends StatelessWidget {
               child: Stack(
                 children: [
 
-                  /// 🔵 ARROW BACKGROUND IMAGE
+                  /// background arrow graphic
                   Center(
                     child: Opacity(
-                      opacity: 0.14,
+                      opacity: 0.10,
                       child: Image.asset(
                         "assets/images/exchange_arrow.png",
-                        width: 800,
+                        width: 700,
                       ),
                     ),
                   ),
 
-                  /// 🔵 BUY BUTTON (upper arrow)
+                  /// BUY BUTTON
                   Align(
-                    alignment: const Alignment(0,-0.2),
-                    child: SizedBox(
+                    alignment: const Alignment(0,-0.12),
+
+                    child: Container(
                       width: double.infinity,
-                      height: 70,
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2F6F6D),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
+                      height: 75,
+
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+
+                        boxShadow: [
+
+                          BoxShadow(
+                            color: const Color(0xFF2F6F6D)
+                                .withOpacity(0.35),
+                            blurRadius: 18,
+                            offset: const Offset(0,8),
                           ),
+
+                        ],
+                      ),
+
+                      child: ElevatedButton.icon(
+
+                        style: ElevatedButton.styleFrom(
+
+                          backgroundColor:
+                          const Color(0xFF2F6F6D),
+
+                          shape:
+                          RoundedRectangleBorder(
+                            borderRadius:
+                            BorderRadius.circular(20),
+                          ),
+
+                          padding:
+                          const EdgeInsets.symmetric(
+                              horizontal: 20
+                          ),
+
                         ),
-                        icon: const Icon(Icons.shopping_bag),
+
+                        icon: const Icon(
+                          Icons.shopping_bag,
+                          size: 24,
+                        ),
+
                         label: const Text(
+
                           "Buy Items",
-                          style: TextStyle(fontSize: 18),
+
+                          style: TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.bold,
+                          ),
+
                         ),
+
                         onPressed: () {
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const BuyItemScreen(),
+                              builder: (_) =>
+                              const BuyItemScreen(),
                             ),
                           );
+
                         },
+
                       ),
                     ),
                   ),
 
-                  /// 🔵 SELL BUTTON (lower arrow)
+                  /// SELL BUTTON
                   Align(
                     alignment: const Alignment(0,0.35),
-                    child: SizedBox(
+
+                    child: Container(
                       width: double.infinity,
-                      height: 70,
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4A9C97),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
+                      height: 75,
+
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+
+                        boxShadow: [
+
+                          BoxShadow(
+                            color: const Color(0xFF4A9C97)
+                                .withOpacity(0.35),
+                            blurRadius: 18,
+                            offset: const Offset(0,8),
                           ),
+
+                        ],
+                      ),
+
+                      child: ElevatedButton.icon(
+
+                        style: ElevatedButton.styleFrom(
+
+                          backgroundColor:
+                          const Color(0xFF4A9C97),
+
+                          shape:
+                          RoundedRectangleBorder(
+                            borderRadius:
+                            BorderRadius.circular(20),
+                          ),
+
+                          padding:
+                          const EdgeInsets.symmetric(
+                              horizontal: 20
+                          ),
+
                         ),
-                        icon: const Icon(Icons.sell),
+
+                        icon: const Icon(
+                          Icons.sell,
+                          size: 24,
+                        ),
+
                         label: const Text(
+
                           "Sell Items",
-                          style: TextStyle(fontSize: 18),
+
+                          style: TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.bold,
+                          ),
+
                         ),
+
                         onPressed: () {
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const PostItemScreen(),
+                              builder: (_) =>
+                              const PostItemScreen(),
                             ),
                           );
+
                         },
+
                       ),
                     ),
                   ),
+
                 ],
               ),
             ),
           ),
+
         ],
       ),
     );

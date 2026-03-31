@@ -10,10 +10,13 @@ import '../services/api_service.dart';
 
 class DriverHomeScreen extends StatefulWidget {
   const DriverHomeScreen({super.key});
+
   @override
   State<DriverHomeScreen> createState() => _DriverHomeScreenState();
 }
+
 class _DriverHomeScreenState extends State<DriverHomeScreen> {
+
   bool isOnline = false;
   List bookings = [];
   String driverName = "";
@@ -22,45 +25,56 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
   @override
   void initState() {
+
     super.initState();
+
     ApiService.pingServer();
+
     loadToken();
+
   }
 
-
-  /// load token
   Future<void> loadToken() async {
 
     final prefs =
     await SharedPreferences.getInstance();
 
-    token = prefs.getString("token");
+    token =
+        prefs.getString("token");
 
-    Future.delayed(const Duration(seconds: 2), () {
-      loadBookings();
-    });
+    Future.delayed(
+
+      const Duration(seconds: 2),
+
+          () {
+
+        loadBookings();
+
+      },
+
+    );
+
   }
 
-
-  /// get bookings from backend
   Future<void> loadBookings() async {
 
     if(token == null) return;
 
     bookings =
-    await ApiService.getDriverBookings(token!);
+    await ApiService
+        .getDriverBookings(token!);
 
     setState(() {});
 
   }
 
-
-  /// toggle online/offline
-  Future<void> updateDriverStatus(bool value) async {
+  Future<void> updateDriverStatus(
+      bool value) async {
 
     if(token == null) return;
 
-    await ApiService.driverOnline(token!);
+    await ApiService
+        .driverOnline(token!);
 
     setState(() {
 
@@ -70,8 +84,6 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
   }
 
-
-  /// logout
   Future<void> logout() async {
 
     final prefs =
@@ -83,12 +95,12 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
   }
 
-
   @override
   Widget build(BuildContext context) {
 
     final height =
-        MediaQuery.of(context).size.height;
+        MediaQuery.of(context)
+            .size.height;
 
     return Scaffold(
 
@@ -96,10 +108,23 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
         children: [
 
+          /// background image
+          Positioned.fill(
+
+            child: Image.asset(
+
+              "assets/images/route.jpeg",
+
+              fit: BoxFit.cover,
+
+            ),
+
+          ),
+
           /// HEADER
           Container(
 
-            height: height * 0.35,
+            height: height * 0.30,
 
             decoration: const BoxDecoration(
 
@@ -118,7 +143,8 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
             child: Padding(
 
-              padding: const EdgeInsets.only(
+              padding:
+              const EdgeInsets.only(
 
                 top: 70,
                 left: 20,
@@ -129,7 +155,8 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               child: Row(
 
                 mainAxisAlignment:
-                MainAxisAlignment.spaceBetween,
+                MainAxisAlignment
+                    .spaceBetween,
 
                 children: [
 
@@ -138,6 +165,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                     icon: const Icon(
 
                       Icons.settings,
+
                       color: Colors.white,
 
                     ),
@@ -171,9 +199,12 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
                     style: TextStyle(
 
-                      fontSize: 24,
+                      fontSize: 22,
+
                       color: Colors.white,
-                      fontWeight: FontWeight.bold,
+
+                      fontWeight:
+                      FontWeight.bold,
 
                     ),
 
@@ -189,11 +220,11 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
           ),
 
-
           /// BODY
           Align(
 
-            alignment: Alignment.bottomCenter,
+            alignment:
+            Alignment.bottomCenter,
 
             child: Container(
 
@@ -201,8 +232,9 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
               padding:
               const EdgeInsets.symmetric(
-
-                  horizontal: 25),
+                  horizontal: 22,
+                  vertical: 25
+              ),
 
               decoration: BoxDecoration(
 
@@ -210,36 +242,44 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                 const Color(0xFFE6F4F1),
 
                 borderRadius:
-                const BorderRadius.only(
+                BorderRadius.zero,
 
-                  topLeft:
-                  Radius.circular(40),
+                boxShadow: [
 
-                  topRight:
-                  Radius.circular(40),
+                  BoxShadow(
 
-                ),
+                    color:
+                    Colors.black
+                        .withOpacity(0.15),
+
+                    blurRadius: 25,
+
+                    offset:
+                    const Offset(0,-10),
+
+                  ),
+
+                ],
 
               ),
 
               child: Column(
 
                 mainAxisAlignment:
-                MainAxisAlignment.center,
+                MainAxisAlignment
+                    .center,
 
                 children: [
 
-                  /// DRIVER INFO
+                  /// DRIVER INFO CARD
                   _menuTile(
 
                     title:
-
                     driverName.isEmpty
                         ? "Driver"
                         : driverName,
 
                     subtitle:
-
                     vehicleNumber.isEmpty
                         ? "Vehicle"
                         : vehicleNumber,
@@ -291,9 +331,8 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 18),
 
-                  /// ride requests count
                   _simpleTile(
 
                     title:
@@ -318,11 +357,12 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
 
                   _simpleTile(
 
-                    title: "Active Ride",
+                    title:
+                    "Active Ride",
 
                     onTap: () {
 
@@ -343,11 +383,12 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
 
                   _simpleTile(
 
-                    title: "Update GPS Location",
+                    title:
+                    "Update GPS Location",
 
                     onTap: () {
 
@@ -368,11 +409,12 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
 
                   _simpleTile(
 
-                    title: "Ride History",
+                    title:
+                    "Ride History",
 
                     onTap: () {
 
@@ -393,9 +435,8 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
                   ),
 
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 25),
 
-                  /// logout
                   SizedBox(
 
                     width: double.infinity,
@@ -405,6 +446,15 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
                     child: OutlinedButton(
 
                       onPressed: logout,
+
+                      style: OutlinedButton.styleFrom(
+
+                        side: const BorderSide(
+                            color:
+                            Color(0xFF2F6F6D)
+                        ),
+
+                      ),
 
                       child: const Text(
 
@@ -461,14 +511,33 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
       child: Container(
 
-        padding: const EdgeInsets.all(18),
+        padding:
+        const EdgeInsets.all(18),
 
         decoration: BoxDecoration(
 
-          color: Colors.white,
+          color:
+          Colors.white.withOpacity(0.95),
 
           borderRadius:
-          BorderRadius.circular(18),
+          BorderRadius.circular(22),
+
+          boxShadow: [
+
+            BoxShadow(
+
+              color:
+              Colors.black
+                  .withOpacity(0.08),
+
+              blurRadius: 18,
+
+              offset:
+              const Offset(0,8),
+
+            ),
+
+          ],
 
         ),
 
@@ -483,12 +552,13 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
               title,
 
-              style: const TextStyle(
+              style:
+              const TextStyle(
 
                 fontWeight:
                 FontWeight.bold,
 
-                fontSize: 16,
+                fontSize: 17,
 
               ),
 
@@ -503,7 +573,8 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               style:
               const TextStyle(
 
-                color: Colors.black54,
+                color:
+                Colors.black54,
 
               ),
 
@@ -537,14 +608,25 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
       width: double.infinity,
 
-      height: 65,
+      height: 60,
 
       child: ElevatedButton(
 
-        style: ElevatedButton.styleFrom(
+        style:
+        ElevatedButton.styleFrom(
 
           backgroundColor:
           const Color(0xFF2F6F6D),
+
+          elevation: 4,
+
+          shape:
+          RoundedRectangleBorder(
+
+            borderRadius:
+            BorderRadius.circular(16),
+
+          ),
 
         ),
 

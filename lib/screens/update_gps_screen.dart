@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 import 'driver_home_screen.dart';
 
 class UpdateGPSScreen extends StatefulWidget {
@@ -14,24 +18,96 @@ class _UpdateGPSScreenState extends State<UpdateGPSScreen> {
   String locationStatus = "Location Sharing: OFF";
   String lastUpdated = "Not Updated Yet";
 
+  Timer? timer;
+
+  /// ✅ changed API endpoint
+  String apiUrl =
+      "https://banasthali-buddy-backend.onrender.com/api/driver/location";
+
+  /// start GPS sharing
   void startSharing() async {
-    // 🔥 Backend GPS API call yaha lagegi
+
+    bool serviceEnabled =
+    await Geolocator.isLocationServiceEnabled();
+
+    if(!serviceEnabled){
+      locationStatus = "Turn ON device location";
+      setState(() {});
+      return;
+    }
+
+    LocationPermission permission =
+    await Geolocator.checkPermission();
+
+    if(permission == LocationPermission.denied){
+
+      permission =
+      await Geolocator.requestPermission();
+
+    }
 
     setState(() {
       isSharing = true;
       locationStatus = "Location Sharing: ON";
-      lastUpdated = DateTime.now().toString();
     });
+
+    timer = Timer.periodic(
+
+      const Duration(seconds: 5),
+
+          (timer) async {
+
+        Position position =
+        await Geolocator.getCurrentPosition();
+
+        /// ✅ changed POST → PUT
+        await http.put(
+
+          Uri.parse(apiUrl),
+
+          headers: {
+            "Content-Type":"application/json"
+          },
+
+          /// ✅ removed busId
+          body: jsonEncode({
+
+            "latitude": position.latitude,
+
+            "longitude": position.longitude
+
+          }),
+
+        );
+
+        setState(() {
+
+          lastUpdated =
+              DateTime.now().toString();
+
+        });
+
+      },
+
+    );
+
   }
 
-  void stopSharing() async {
-    // 🔥 Backend stop API call yaha lagegi
+  /// stop GPS sharing
+  void stopSharing(){
+
+    timer?.cancel();
 
     setState(() {
+
       isSharing = false;
+
       locationStatus = "Location Sharing: OFF";
+
       lastUpdated = DateTime.now().toString();
+
     });
+
   }
 
   @override
@@ -43,7 +119,6 @@ class _UpdateGPSScreenState extends State<UpdateGPSScreen> {
 
           const SizedBox(height: 70),
 
-          /// 🔙 Top Bar
           Row(
             children: [
               IconButton(
@@ -83,7 +158,6 @@ class _UpdateGPSScreenState extends State<UpdateGPSScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
-                  /// 📍 Current Status
                   const Text(
                     "Current Status",
                     style: TextStyle(
@@ -112,7 +186,6 @@ class _UpdateGPSScreenState extends State<UpdateGPSScreen> {
 
                   const SizedBox(height: 25),
 
-                  /// 🔘 Start Button
                   SizedBox(
                     width: double.infinity,
                     height: 50,
@@ -130,7 +203,6 @@ class _UpdateGPSScreenState extends State<UpdateGPSScreen> {
 
                   const SizedBox(height: 15),
 
-                  /// 🔘 Stop Button
                   SizedBox(
                     width: double.infinity,
                     height: 50,
@@ -151,7 +223,6 @@ class _UpdateGPSScreenState extends State<UpdateGPSScreen> {
 
                   const Spacer(),
 
-                  /// 🏠 Direct Dashboard Button
                   SizedBox(
                     width: double.infinity,
                     height: 50,
