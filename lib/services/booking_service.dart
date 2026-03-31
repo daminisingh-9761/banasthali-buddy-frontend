@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'api_config.dart';
+import '../config/api_config.dart';
 
 class BookingService {
 
@@ -10,7 +10,7 @@ class BookingService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString("token");
 
-    final url = Uri.parse("${ApiConfig.baseUrl}/api/bookings/request");
+    final url = Uri.parse("https://banasthali-buddy.onrender.com/api/bookings/request");
 
     print("TOKEN: $token");
     print("REQUEST URL: $url");
@@ -47,7 +47,7 @@ class BookingService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString("token");
 
-    final url = Uri.parse("${ApiConfig.baseUrl}/api/bookings/me/student");
+    final url = Uri.parse("https://banasthali-buddy.onrender.com/api/bookings/me/student");
 
     print("GET STUDENT BOOKINGS");
     print("TOKEN: $token");
@@ -79,7 +79,7 @@ class BookingService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString("token");
 
-    final url = Uri.parse("${ApiConfig.baseUrl}/api/bookings/me/driver");
+    final url = Uri.parse("https://banasthali-buddy.onrender.com/api/bookings/me/driver");
 
     if (token == null) {
       print("ERROR: TOKEN IS NULL");
@@ -108,7 +108,7 @@ class BookingService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString("token");
 
-    final url = Uri.parse("${ApiConfig.baseUrl}/api/bookings/$bookingId/status");
+    final url = Uri.parse("https://banasthali-buddy.onrender.com/api/bookings/$bookingId/status");
 
     if (token == null) {
       print("ERROR: TOKEN IS NULL");

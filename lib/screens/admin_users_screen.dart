@@ -45,41 +45,70 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Manage Users"),
         backgroundColor: const Color(0xFF2F6F6D),
+        title: const Text("Manage Users",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            shadows: [
+              Shadow(
+                blurRadius: 4,
+                color: Colors.black26,
+                offset: Offset(1, 2),
+              ),
+            ],
+          ),
+        ),
+        centerTitle: true,
       ),
 
-      body: ListView.builder(
-        itemCount: users.length,
-        itemBuilder: (context, index){
 
-          final user = users[index];
+      /// 🔹 BODY WITH BACKGROUND
+      body: Stack(
+        children: [
 
-          return Column(
-            children: [
+          /// 🔹 BACKGROUND IMAGE
+          Positioned.fill(
+            child: Image.asset(
+              "assets/images/route.jpeg",
+              fit: BoxFit.cover,
+            ),
+          ),
 
-              ListTile(
-                leading: const CircleAvatar(
-                  child: Icon(Icons.person),
-                ),
+          /// 🔹 ORIGINAL LIST
+          ListView.builder(
+            itemCount: users.length,
+            itemBuilder: (context, index){
 
-                title: Text(user["username"] ?? ""),
+              final user = users[index];
 
-                subtitle: Text(user["role"] ?? ""),
+              return Column(
+                children: [
 
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () {
-                    deleteUser(user["id"]);
-                  },
-                ),
-              ),
+                  ListTile(
+                    leading: const CircleAvatar(
+                      child: Icon(Icons.person),
+                    ),
 
-              const Divider(),
+                    title: Text(user["username"] ?? ""),
 
-            ],
-          );
-        },
+                    subtitle: Text(user["role"] ?? ""),
+
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () {
+                        deleteUser(user["id"]);
+                      },
+                    ),
+                  ),
+
+                  const Divider(),
+
+                ],
+              );
+            },
+          ),
+        ],
       ),
     );
   }

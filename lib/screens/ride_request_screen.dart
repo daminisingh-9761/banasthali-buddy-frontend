@@ -1,143 +1,183 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../services/api_service.dart';
 
 class RideRequestScreen extends StatefulWidget {
+
   const RideRequestScreen({super.key});
 
   @override
-  State<RideRequestScreen> createState() => _RideRequestScreenState();
+  State<RideRequestScreen> createState() =>
+      _RideRequestScreenState();
+
 }
 
-class _RideRequestScreenState extends State<RideRequestScreen> {
+class _RideRequestScreenState
+    extends State<RideRequestScreen> {
 
-  // Backend se aayega
-  List<Map<String, dynamic>> rideRequests = [];
+  List bookings = [];
 
-  void acceptRide(int index) {
-    // 🔥 Backend API call yaha lagegi
-    setState(() {
-      rideRequests.removeAt(index);
-    });
-  }
+  String? token;
 
-  void rejectRide(int index) {
-    // 🔥 Backend API call yaha lagegi
-    setState(() {
-      rideRequests.removeAt(index);
-    });
-  }
+  bool isLoading = true;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF2F6F6D),
-      body: Column(
-        children: [
+  void initState(){
 
-          const SizedBox(height: 70),
+    super.initState();
 
-          Row(
-            children: [
-              IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-              ),
-              const Expanded(
-                child: Text(
-                  "Ride Requests",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 48),
-            ],
-          ),
+    loadToken();
 
-          const SizedBox(height: 20),
-
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                color: Color(0xFFE6F4F1),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(40),
-                  topRight: Radius.circular(40),
-                ),
-              ),
-              child: rideRequests.isEmpty
-                  ? const Center(
-                child: Text(
-                  "No Pending Ride Requests",
-                  style: TextStyle(fontSize: 16),
-                ),
-              )
-                  : ListView.builder(
-                itemCount: rideRequests.length,
-                itemBuilder: (context, index) {
-                  final ride = rideRequests[index];
-
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15)),
-                    margin: const EdgeInsets.only(bottom: 15),
-                    child: Padding(
-                      padding: const EdgeInsets.all(15),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-
-                          Text(
-                            "Student: ${ride["student"]}",
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold),
-                          ),
-                          Text("Pickup: ${ride["pickup"]}"),
-                          Text("Drop: ${ride["drop"]}"),
-                          Text("Distance: ${ride["distance"]}"),
-
-                          const SizedBox(height: 10),
-
-                          Row(
-                            children: [
-                              Expanded(
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                    const Color(0xFF2F6F6D),
-                                  ),
-                                  onPressed: () {
-                                    acceptRide(index);
-                                  },
-                                  child: const Text("Accept"),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: OutlinedButton(
-                                  onPressed: () {
-                                    rejectRide(index);
-                                  },
-                                  child: const Text("Reject"),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
+
+
+  /// load token
+  Future<void> loadToken() async {
+
+    final prefs =
+    await SharedPreferences.getInstance();
+
+    token = prefs.getString("token");
+
+    loadBookings();
+
+  }
+
+
+  /// get pending bookings
+  Future<void> loadBookings() async {
+
+    if(token == null) return;
+
+    bookings =
+    await ApiService.getDriverBookings(token!);
+
+    if (!mounted) return;
+
+    setState(() {
+
+      isLoading = false;
+
+    });
+  }
+
+
+  /// accept ride
+  Future<void> acceptRide(
+
+      String bookingId
+
+      ) async {
+
+    await ApiService.updateBookingStatus(
+
+      token!,
+
+      bookingId,
+
+      "ACCEPTED",
+
+    );
+
+    loadBookings();
+
+  }
+
+
+  @override
+  Widget build(BuildContext context){
+
+    return Scaffold(
+
+      appBar: AppBar(
+
+        title:
+        const Text("Ride Requests"),
+
+      ),
+
+      body:
+
+      isLoading
+
+          ? const Center(
+
+        child:
+        CircularProgressIndicator(),
+
+      )
+
+          :
+
+      bookings.isEmpty
+
+          ? const Center(
+
+        child: Text(
+
+          "No ride requests",
+
+        ),
+
+      )
+
+          :
+
+      ListView.builder(
+
+        itemCount:
+        bookings.length,
+
+        itemBuilder: (_, i){
+
+          var b = bookings[i];
+
+          return Card(
+
+            margin:
+            const EdgeInsets.all(10),
+
+            child: ListTile(
+
+              title: Text(
+
+                "Pickup: ${b["pickupPostId"]}",
+
+              ),
+
+              subtitle: Text(
+
+                "Destination: ${b["destinationPostId"]}",
+
+              ),
+
+              trailing: ElevatedButton(
+
+                onPressed: (){
+
+                  acceptRide(
+
+                    b["id"],
+
+                  );
+
+                },
+
+                child:
+                const Text("Accept"),
+
+              ),
+
+            ),
+
+          );
+
+        },
+
+      ),
+
+    );
+
+  }
+
 }

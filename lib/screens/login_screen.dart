@@ -5,6 +5,7 @@ import 'package:frontend/screens/admin_home_screen.dart';
 import 'package:frontend/screens/signup_screen.dart';
 import '../services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,6 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
 
   final ApiService apiService = ApiService();
   bool isLoading = false;
@@ -32,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
           /// 🔵 TOP GRADIENT
           Container(
-            height: MediaQuery.of(context).size.height * 0.45,
+            height: MediaQuery.of(context).size.height * 0.20,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -45,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             alignment: Alignment.center,
             child: const Padding(
-              padding: EdgeInsets.only(top: 60),
+              padding: EdgeInsets.only(top: 44),
               child: Text(
                 "Login",
                 style: TextStyle(
@@ -61,10 +63,13 @@ class _LoginScreenState extends State<LoginScreen> {
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.70,
+              height: MediaQuery.of(context).size.height * 0.85,
               padding: const EdgeInsets.all(25),
               decoration: BoxDecoration(
-                color: const Color(0xFFE6F4F1),
+                image: const DecorationImage(
+                  image: AssetImage("assets/images/route.jpeg"),
+                  fit: BoxFit.cover,
+                ),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(40),
                   topRight: Radius.circular(40),
@@ -129,9 +134,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text("Forgot Password Clicked")),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const ForgotPasswordScreen(),
+                            ),
                           );
                         },
                         child: const Text(
@@ -157,63 +164,65 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: () async {
+    onPressed: () async {
 
-                          setState(() => isLoading = true);
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
 
-                          final result = await apiService.login(
-                            emailController.text.trim(),
-                            passwordController.text.trim(),
-                          );
+    if (email.isEmpty || password.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text("All fields required")),
+    );
+    return;
+    }
 
-                          setState(() => isLoading = false);
+    setState(() => isLoading = true);
 
-                          if (!mounted) return;
+    await ApiService.pingServer();
+    await Future.delayed(const Duration(seconds: 2));
 
-                          if (result["success"] == true) {
+    final result = await ApiService.login(email, password);
 
-                            final prefs = await SharedPreferences.getInstance();
+    setState(() => isLoading = false);
 
-                            await prefs.setString("token", result["token"]);
+    if (!mounted) return;
 
-                            print("TOKEN SAVED: ${result["token"]}");
+    if (result["success"] == true && result["role"] != null) {
+      /// ✅ SAVE TOKEN (MOST IMPORTANT)
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString("token", result["token"]);
 
-                            String role = result["role"];
+    String role = result["role"];
 
-                            if (role == "driver") {
+    if (role == "driver") {
+    Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (_) => const DriverHomeScreen()),
+    );
+    } else if (role == "admin") {
+    Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (_) => const AdminHomeScreen()),
+    );
+    } else {
+    Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (_) => const HomeScreen()),
+    );
+    }
 
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const DriverHomeScreen(),
-                                ),
-                              );
+    } else {
 
-                            } else if (role == "admin") {
+    ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+    content: Text(
+    result["message"] ?? "Invalid email or password",
+    ),
+    ),
+    );
 
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const AdminHomeScreen(),
-                                ),
-                              );
-
-                            } else {
-
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const HomeScreen(),
-                                ),
-                              );
-                            }
-                          } else {
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Login failed")),
-                            );
-                          }
-                        },
+    }
+    },
                         child: isLoading
                             ? const CircularProgressIndicator(color: Colors.white)
                             : const Text("Login"),

@@ -25,39 +25,122 @@ class _ConfirmRideScreenState extends State<ConfirmRideScreen> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Confirm Ride")),
 
+      /// ✅ HEADER UPDATED
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF2F6F6D),
+        title: const Text(
+          "Confirm Ride",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+            shadows: [
+              Shadow(
+                blurRadius: 4,
+                color: Colors.black26,
+                offset: Offset(1, 2),
+              ),
+            ],
+          ),
+        ),
+        centerTitle: true,
+      ),
+
+      /// ✅ BODY WITH BACKGROUND
       body: Stack(
         children: [
 
-          /// 🔵 CONTENT
+          /// 🔹 BACKGROUND IMAGE
+          Positioned.fill(
+            child: Image.asset(
+              "assets/images/pick_bg.jpeg",
+              fit: BoxFit.cover,
+            ),
+          ),
+
+          /// 🔹 CONTENT
           Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
 
-                Text("Pickup: ${widget.pickup}",
-                    style: const TextStyle(fontSize: 16)),
+                /// 🟢 CARD FOR DETAILS
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.85),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Column(
+                    children: [
 
-                const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          const Icon(Icons.my_location,
+                              color: Color(0xFF2F6F6D)),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              "Pickup: ${widget.pickup}",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
 
-                Text("Drop: ${widget.drop}",
-                    style: const TextStyle(fontSize: 16)),
+                      const SizedBox(height: 10),
 
-                const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          const Icon(Icons.location_on,
+                              color: Color(0xFF2F6F6D)),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              "Drop: ${widget.drop}",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
 
-                const Text(
-                  "Estimated Fare: ₹30",
-                  style: TextStyle(fontSize: 16),
-                ),
+                      const SizedBox(height: 15),
 
-                const Text(
-                  "Estimated Time: 10 mins",
-                  style: TextStyle(fontSize: 16),
+                      const Divider(),
+
+                      const SizedBox(height: 10),
+
+                      const Text(
+                        "Estimated Fare: ₹30",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+
+                      const SizedBox(height: 5),
+
+                      const Text(
+                        "Estimated Time: 10 mins",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
 
                 const SizedBox(height: 40),
 
+                /// 🔘 BUTTON
                 isLoading
                     ? const CircularProgressIndicator()
                     : SizedBox(

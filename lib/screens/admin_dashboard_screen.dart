@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/admin_api_service.dart';
+import 'settings_screen.dart'; // ✅ ADD
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -35,11 +36,11 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   Widget dashboardCard(String title, String value, IconData icon) {
-    return Card(
-      shape: RoundedRectangleBorder(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.85),
         borderRadius: BorderRadius.circular(15),
       ),
-      elevation: 3,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -71,31 +72,75 @@ class _AdminDashboardState extends State<AdminDashboard> {
   Widget build(BuildContext context) {
 
     return Scaffold(
+
+      /// 🔵 HEADER (WITH SETTINGS ICON)
       appBar: AppBar(
-        title: const Text("Admin Dashboard"),
         backgroundColor: const Color(0xFF2F6F6D),
-      ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+        leading: IconButton(
+          icon: const Icon(Icons.settings, color: Colors.white),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const SettingsScreen(role: "admin"),
+              ),
+            );
+          },
+        ),
 
-        child: GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-
-          children: [
-
-            dashboardCard("Students", students.toString(), Icons.school),
-
-            dashboardCard("Drivers", drivers.toString(), Icons.drive_eta),
-
-            dashboardCard("Active Rides", rides.toString(), Icons.directions_car),
-
-            dashboardCard("Listings", listings.toString(), Icons.store),
-
+        title: const Text("Admin Dashboard",
+        style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          shadows: [
+            Shadow(
+              blurRadius: 4,
+              color: Colors.black26,
+              offset: Offset(1, 2),
+            ),
           ],
         ),
+        ),
+        centerTitle: true,
+      ),
+
+      /// 🔹 BODY WITH BACKGROUND
+      body: Stack(
+        children: [
+
+          /// 🔹 BACKGROUND IMAGE
+          Positioned.fill(
+            child: Image.asset(
+              "assets/images/route.jpeg",
+              fit: BoxFit.cover,
+            ),
+          ),
+
+          /// 🔹 CONTENT
+          Padding(
+            padding: const EdgeInsets.all(16),
+
+            child: GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+
+              children: [
+
+                dashboardCard("Students", students.toString(), Icons.school),
+
+                dashboardCard("Drivers", drivers.toString(), Icons.drive_eta),
+
+                dashboardCard("Active Rides", rides.toString(), Icons.directions_car),
+
+                dashboardCard("Listings", listings.toString(), Icons.store),
+
+
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

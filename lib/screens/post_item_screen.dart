@@ -1,7 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../services/api_service.dart';
 import 'home_screen.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class PostItemScreen extends StatefulWidget {
   const PostItemScreen({super.key});
@@ -14,14 +17,19 @@ class _PostItemScreenState extends State<PostItemScreen> {
   File? _itemImage;
   final ImagePicker _picker = ImagePicker();
 
+
   final TextEditingController itemNameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
-  final TextEditingController hostelController = TextEditingController();
-  final TextEditingController contactController = TextEditingController();
+  final TextEditingController categoryController = TextEditingController(); // ✅ ADDED
+  final TextEditingController sellerPhoneController = TextEditingController();
+  final TextEditingController sellerHostelController = TextEditingController();
+  final TextEditingController sellerRoomController = TextEditingController();
 
-  /// ✅ UPDATED BOTTOM SHEET UI
+  /// 🔹 IMAGE PICKER (UNCHANGED)
   Future<void> _pickImage() async {
+    await Permission.camera.request();
+    await Permission.storage.request();
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -36,19 +44,16 @@ class _PostItemScreenState extends State<PostItemScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
 
-                /// 🔹 TOP BAR (CLOSE + TITLE + DELETE)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-
-                    /// ❌ CLOSE
                     IconButton(
                       icon: const Icon(Icons.close, color: Color(0xFF2F6F6D)),
                       onPressed: () => Navigator.pop(context),
                     ),
 
                     const Text(
-                      " Add Picture",
+                      "Add Picture",
                       style: TextStyle(
                         color: Color(0xFF2F6F6D),
                         fontSize: 18,
@@ -56,7 +61,6 @@ class _PostItemScreenState extends State<PostItemScreen> {
                       ),
                     ),
 
-                    /// 🗑️ DELETE
                     IconButton(
                       icon: const Icon(Icons.delete, color: Color(0xFF2F6F6D)),
                       onPressed: () {
@@ -70,14 +74,25 @@ class _PostItemScreenState extends State<PostItemScreen> {
                 ),
 
                 const SizedBox(height: 20),
-
-                /// 📸 CAMERA
+                ///camera
                 ListTile(
                   leading: const Icon(Icons.camera_alt, color: Color(0xFF2F6F6D)),
                   title: const Text("Camera",
                       style: TextStyle(color: Color(0xFF2F6F6D))),
                   onTap: () async {
                     Navigator.pop(context);
+                    /// check permission
+
+                    var status = await Permission.camera.request();
+
+                    if (!status.isGranted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Camera permission denied")),
+                      );
+                      return;
+                    }
+
+
                     final XFile? image =
                     await _picker.pickImage(source: ImageSource.camera);
 
@@ -88,14 +103,22 @@ class _PostItemScreenState extends State<PostItemScreen> {
                     }
                   },
                 ),
-
-                /// 🖼️ GALLERY
+                  /// gallery
                 ListTile(
                   leading: const Icon(Icons.image, color: Color(0xFF2F6F6D)),
                   title: const Text("Gallery",
                       style: TextStyle(color: Color(0xFF2F6F6D))),
                   onTap: () async {
                     Navigator.pop(context);
+                    /// ✅ ANDROID VERSION BASED FIX
+                    var status = await Permission.photos.request(); // 🔥 IMPORTANT
+
+                    if (!status.isGranted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Gallery permission denied")),
+                      );
+                      return;
+                    }
                     final XFile? image =
                     await _picker.pickImage(source: ImageSource.gallery);
 
@@ -114,12 +137,16 @@ class _PostItemScreenState extends State<PostItemScreen> {
     );
   }
 
-  void _postItem() {
+  /// 🔥 UPDATED FUNCTION
+  Future<void> _postItem() async {
+
     if (_itemImage == null ||
         itemNameController.text.isEmpty ||
         priceController.text.isEmpty ||
-        hostelController.text.isEmpty ||
-        contactController.text.isEmpty) {
+        sellerPhoneController.text.isEmpty ||
+        sellerHostelController.text.isEmpty ||
+        sellerRoomController.text.isEmpty) {
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Please fill all required fields"),
@@ -128,18 +155,51 @@ class _PostItemScreenState extends State<PostItemScreen> {
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Item Posted Successfully")),
+    final prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString("token");
+
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("User not logged in")),
+      );
+      return;
+    }
+
+    bool success = await ApiService.postItem(
+      "",
+      itemNameController.text.trim(),
+      descriptionController.text.trim(),
+      priceController.text.trim(),
+      categoryController.text.trim(),
+      sellerPhoneController.text.trim(),
+      sellerHostelController.text.trim(),
+      sellerRoomController.text.trim(),
+      _itemImage,
     );
 
-    Navigator.pop(context);
+    if (!mounted) return;
+
+    if (success) {
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Item Posted Successfully")),
+      );
+
+      Navigator.pop(context);
+
+    } else {
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to post item")),
+      );
+
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
 
-      /// HEADER (same as Buy screen)
       appBar: AppBar(
         backgroundColor: const Color(0xFF2F6F6D),
         title: const Text(
@@ -158,7 +218,6 @@ class _PostItemScreenState extends State<PostItemScreen> {
             ],
           ),
         ),
-
         centerTitle: true,
         actions: [
           IconButton(
@@ -176,115 +235,175 @@ class _PostItemScreenState extends State<PostItemScreen> {
         ],
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
+      body: Stack(
+        children: [
 
-              /// IMAGE PICKER (UNCHANGED)
-              GestureDetector(
-                onTap: _pickImage,
-                child: Container(
-                  height: 160,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: _itemImage == null
-                      ? const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.add_a_photo, size: 40),
-                      SizedBox(height: 8),
-                      Text("Add Item Image"),
-                    ],
-                  )
-                      : Image.file(
-                    _itemImage!,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              TextField(
-                controller: itemNameController,
-                decoration: const InputDecoration(
-                  labelText: "Item Name *",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              TextField(
-                controller: descriptionController,
-                decoration: const InputDecoration(
-                  labelText: "Description",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              TextField(
-                controller: priceController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: "Price *",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-
-              const SizedBox(height: 25),
-
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Seller Contact",
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              TextField(
-                controller: hostelController,
-                decoration: const InputDecoration(
-                  labelText: "Hostel Name *",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              TextField(
-                controller: contactController,
-                keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(
-                  labelText: "Contact Number *",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-
-              const SizedBox(height: 25),
-
-              SizedBox(
-                width: double.infinity,
-                height: 45,
-                child: ElevatedButton(
-                  onPressed: _postItem,
-                  child: const Text("Post Item"),
-                ),
-              ),
-            ],
+          Positioned.fill(
+            child: Image.asset(
+              "assets/images/route.jpeg",
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
+
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: Container(
+                    height: 160,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.85),
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: _itemImage == null
+                        ? const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.add_a_photo, size: 40),
+                        SizedBox(height: 8),
+                        Text("Add Item Image"),
+                      ],
+                    )
+                        : Image.file(
+                      _itemImage!,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                TextField(
+                  controller: itemNameController,
+                  decoration: InputDecoration(
+                    labelText: "Item Name *",
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.9),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 15),
+
+                TextField(
+                  controller: descriptionController,
+                  decoration: InputDecoration(
+                    labelText: "Description",
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.9),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 15),
+
+                /// ✅ CATEGORY FIELD ADDED
+                TextField(
+                  controller: categoryController,
+                  decoration: InputDecoration(
+                    labelText: "Category",
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.9),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 15),
+
+                TextField(
+                  controller: priceController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: "Price *",
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.9),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 25),
+
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Seller Contact",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                TextField(
+                  controller: sellerPhoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    labelText: "Seller Phone *",
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.9),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 15),
+
+                TextField(
+                  controller: sellerHostelController,
+                  decoration: InputDecoration(
+                    labelText: "Seller Hostel *",
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.9),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 15),
+
+                TextField(
+                  controller: sellerRoomController,
+                  decoration: InputDecoration(
+                    labelText: "Seller Room *",
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.9),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: double.infinity,
+                  height: 45,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2F6F6D),
+                    ),
+                    onPressed: _postItem,
+                    child: const Text("Post Item"),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

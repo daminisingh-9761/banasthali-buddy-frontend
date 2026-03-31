@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:frontend/screens/login_screen.dart';
-import 'package:frontend/screens/signup_screen.dart';
-import '../services/api_service.dart'; // ✅ ADD THIS
+import '../services/api_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,58 +12,105 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
 
-  final ApiService apiService = ApiService(); // ✅ ADD THIS
-
   @override
   void initState() {
     super.initState();
 
-    // ✅ NEW: Server warmup (NO UI CHANGE)
-    apiService.pingServer();
+    // wake up render backend
+    ApiService.pingServer();
 
-    Future.delayed(const Duration(seconds: 10), () {
-      if (mounted) {
+    // navigate to login after delay
+    Timer(const Duration(seconds: 10), () {
+
+      if(mounted){
+
         Navigator.pushReplacement(
+
           context,
+
           MaterialPageRoute(
-            builder: (_) => LoginScreen(),
+
+            builder: (_) => const LoginScreen(),
+
           ),
+
         );
+
       }
+
     });
+
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
+
       body: Container(
+
         decoration: const BoxDecoration(
+
           gradient: LinearGradient(
+
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
+
             colors: [
-              Color(0xFFE6F4F1), // Light Mint
-              Color(0xFFCDEAE4), // Soft Teal
+
+              Color(0xFFE6F4F1),
+              Color(0xFFCDEAE4),
+
             ],
+
           ),
+
         ),
+
         child: Center(
+
           child: Column(
+
             mainAxisAlignment: MainAxisAlignment.center,
+
             children: [
 
-              /// 🔵 LOGO
+              // LOGO
               Image.asset(
-                'assets/images/logo.jpeg',
-                height: 200,
+
+                'assets/images/LOGO.png',
+                height: 600,
+
               ),
 
               const SizedBox(height: 20),
 
+              const CircularProgressIndicator(),
+
+              const SizedBox(height: 10),
+
+              const Text(
+
+                "Loading...",
+                style: TextStyle(
+
+                  color: Colors.black54,
+                  fontSize: 16,
+
+                ),
+
+              )
+
             ],
+
           ),
+
         ),
+
       ),
+
     );
+
   }
+
 }

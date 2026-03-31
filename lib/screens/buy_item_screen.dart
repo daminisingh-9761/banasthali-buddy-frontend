@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart'; // 🔹 ADD THIS
-// existing imports remain same
+import '../services/api_service.dart';
+import 'home_screen.dart';
 
 class BuyItemScreen extends StatefulWidget {
   const BuyItemScreen({super.key});
@@ -10,81 +10,73 @@ class BuyItemScreen extends StatefulWidget {
 }
 
 class _BuyItemScreenState extends State<BuyItemScreen> {
+
   final TextEditingController _searchController = TextEditingController();
 
-  final List<Map<String, String>> items = [
-    {
-      "name": "Study Table",
-      "price": "₹1200",
-      "description": "Good condition wooden table",
-      "hostel": "Apaji Hostel",
-      "contact": "9876543210",
-      "image": "",
-    },
-    {
-      "name": "Cycle",
-      "price": "₹2500",
-      "description": "Used cycle, smooth condition",
-      "hostel": "Gandhi Hostel",
-      "contact": "9123456780",
-      "image": "",
-    },
-  ];
+  List items = [];
+  List filteredItems = [];
 
-  List<Map<String, String>> filteredItems = [];
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    filteredItems = items;
+    loadItems();
   }
 
-  void searchItem(String query) {
+  Future<void> loadItems() async {
+    final data = await ApiService.getItems();
+    print("ITEMS DATA: $data"); // 🔥 ADD THIS LINE
+    if (!mounted) return; // ✅ FIX
+
     setState(() {
-      filteredItems = items
-          .where((item) =>
-          item["name"]!.toLowerCase().contains(query.toLowerCase()))
-          .toList();
+      items = data;
+      filteredItems = data;
+      isLoading = false;
     });
+  }
+
+  Future<void> searchItem(String query) async {
+    if (query.isEmpty) {
+      loadItems();
+      return;
+    }
+
+    final data = await ApiService.searchItems(query);
+
+    setState(() {
+      filteredItems = data;
+    });
+  }
+
+  Future<void> filterByCategory(String category) async {
+    final data = await ApiService.getItemsByCategory(category);
+
+    setState(() {
+      filteredItems = data;
+    });
+  }
+
+  Future<void> deleteItem(String id) async {
+    await ApiService.deleteItem(id);
+    loadItems(); // ✅ refresh
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE6F4F1),
+
       appBar: AppBar(
         backgroundColor: const Color(0xFF2F6F6D),
-
-        /// ✅ UPDATED TITLE (ONLY CHANGE)
-        title: const Text(
-          "Buy Items",
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
-            color: Colors.white,
-            shadows: [
-              Shadow(
-                blurRadius: 4,
-                color: Colors.black26,
-                offset: Offset(1, 2),
-              ),
-            ],
-          ),
-        ),
-
+        title: const Text("Buy Items"),
         centerTitle: true,
-
-        /// 🔹 HOME BUTTON (UNCHANGED)
         actions: [
           IconButton(
             icon: const Icon(Icons.home),
             onPressed: () {
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => const HomeScreen(),
-                ),
+                MaterialPageRoute(builder: (_) => const HomeScreen()),
                     (route) => false,
               );
             },
@@ -92,159 +84,172 @@ class _BuyItemScreenState extends State<BuyItemScreen> {
         ],
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
+      body: Stack(
+        children: [
 
-            /// 🔍 Search Bar
-            TextField(
-              controller: _searchController,
-              onChanged: searchItem,
-              decoration: InputDecoration(
-                hintText: "Search items...",
-                prefixIcon: const Icon(Icons.search),
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding:
-                const EdgeInsets.symmetric(vertical: 14),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide.none,
-                ),
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Image.asset(
+                "assets/images/route.jpeg",
+                fit: BoxFit.cover,
               ),
             ),
+          ),
 
-            const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
 
-            /// 📦 Item Listings
-            Expanded(
-              child: filteredItems.isEmpty
-                  ? const Center(child: Text("No items found"))
-                  : ListView.builder(
-                itemCount: filteredItems.length,
-                itemBuilder: (context, index) {
-                  final item = filteredItems[index];
-
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 15),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(18),
-                      boxShadow: [
-                        BoxShadow(
-                          color:
-                          Colors.black.withOpacity(0.05),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        )
-                      ],
+                TextField(
+                  controller: _searchController,
+                  onChanged: searchItem,
+                  decoration: InputDecoration(
+                    hintText: "Search items...",
+                    prefixIcon: const Icon(Icons.search),
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.9),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide.none,
                     ),
-                    child: Row(
-                      children: [
+                  ),
+                ),
 
-                        ClipRRect(
-                          borderRadius:
-                          BorderRadius.circular(12),
-                          child: Container(
-                            height: 80,
-                            width: 80,
-                            color: const Color(0xFFCDEAE4),
-                            child: const Icon(
-                              Icons.image,
-                              color: Color(0xFF2F6F6D),
+                const SizedBox(height: 10),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    TextButton(onPressed: loadItems, child: const Text("All")),
+                    TextButton(onPressed: () => filterByCategory("Books"), child: const Text("Books")),
+                    TextButton(onPressed: () => filterByCategory("Electronics"), child: const Text("Electronics")),
+                  ],
+                ),
+
+                const SizedBox(height: 10),
+
+                Flexible(
+                  child: isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : filteredItems.isEmpty
+                      ? const Center(child: Text("No items found")) // ✅ FIX
+                      : ListView.builder(
+                    itemCount: filteredItems.length,
+                    itemBuilder: (context, index) {
+
+                      final item = filteredItems[index];
+
+                      return Stack(
+                        children: [
+
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 15),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.85),
+                              borderRadius: BorderRadius.circular(18),
                             ),
-                          ),
-                        ),
 
-                        const SizedBox(width: 15),
+                            child: Row(
+                              children: [
 
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item["name"]!,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight:
-                                  FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                item["description"]!,
-                                style: const TextStyle(
-                                    color: Colors.black54),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                "Price: ${item["price"]}",
-                                style: const TextStyle(
-                                    fontWeight:
-                                    FontWeight.w600),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        ElevatedButton(
-                          style:
-                          ElevatedButton.styleFrom(
-                            backgroundColor:
-                            const Color(0xFF2F6F6D),
-                            shape:
-                            RoundedRectangleBorder(
-                              borderRadius:
-                              BorderRadius.circular(12),
-                            ),
-                          ),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) =>
-                                  AlertDialog(
-                                    title: const Text(
-                                        "Seller Details"),
-                                    content: Column(
-                                      mainAxisSize:
-                                      MainAxisSize.min,
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment
-                                          .start,
-                                      children: [
-                                        Text(
-                                            "Hostel: ${item["hostel"]}"),
-                                        const SizedBox(
-                                            height: 8),
-                                        Text(
-                                            "Contact Number: ${item["contact"]}"),
-                                      ],
+                                Container(
+                                  height: 80,
+                                  width: 80,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFCDEAE4),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: item["image"] != null && item["image"].toString().isNotEmpty
+                                      ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                      "https://banasthali-buddy.onrender.com/${item["image"]}",
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return const Icon(Icons.image);
+                                      },
                                     ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.pop(
-                                                context),
-                                        child:
-                                        const Text("Close"),
-                                      ),
+                                  )
+                                      : const Icon(Icons.image),
+                                ),
+
+                                const SizedBox(width: 15),
+
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(item["title"] ?? "",
+                                          style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold)),
+                                      Text(item["description"] ?? ""),
+                                      Text("₹${item["price"]}"),
                                     ],
                                   ),
-                            );
-                          },
-                          child: const Text("Contact"),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+                                ),
+
+                                Column(
+                                  children: [
+
+                                    ElevatedButton(
+                                      onPressed: item["sold"] == true
+                                          ? null
+                                          : () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (_) => AlertDialog(
+                                            title: const Text("Seller Details"),
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text("Phone: ${item["sellerPhone"]}"),
+                                                Text("Hostel: ${item["sellerHostel"]}"),
+                                                Text("Room: ${item["sellerRoom"]}"),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Text(
+                                        item["sold"] == true ? "Sold Out" : "Contact",
+                                      ),
+                                    ),
+
+                                    IconButton(
+                                      icon: const Icon(Icons.delete, color: Colors.red),
+                                      onPressed: item["id"] == null
+                                          ? null
+                                          : () => deleteItem(item["id"]),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+
+                          if (item["sold"] == true)
+                            Positioned(
+                              top: 5,
+                              right: 10,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                color: Colors.red,
+                                child: const Text("SOLD",
+                                    style: TextStyle(color: Colors.white)),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -45,9 +45,24 @@ class _AdminRoutesScreenState extends State<AdminRoutesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Manage Routes"),
         backgroundColor: const Color(0xFF2F6F6D),
+        title: const Text("Manage Routes",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            shadows: [
+              Shadow(
+                blurRadius: 4,
+                color: Colors.black26,
+                offset: Offset(1, 2),
+              ),
+            ],
+          ),
+        ),
+        centerTitle: true,
       ),
+
+
 
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFF2F6F6D),
@@ -57,35 +72,50 @@ class _AdminRoutesScreenState extends State<AdminRoutesScreen> {
         child: const Icon(Icons.add),
       ),
 
-      body: ListView.builder(
-        itemCount: routes.length,
-        itemBuilder: (context, index){
+      /// 🔹 BODY WITH BACKGROUND
+      body: Stack(
+        children: [
 
-          final route = routes[index];
+          /// 🔹 BACKGROUND IMAGE
+          Positioned.fill(
+            child: Image.asset(
+              "assets/images/route.jpeg",
+              fit: BoxFit.cover,
+            ),
+          ),
 
-          return Column(
-            children: [
+          /// 🔹 ORIGINAL LIST
+          ListView.builder(
+            itemCount: routes.length,
+            itemBuilder: (context, index){
 
-              ListTile(
-                leading: const Icon(Icons.route),
+              final route = routes[index];
 
-                title: Text(route["name"] ?? ""),
+              return Column(
+                children: [
 
-                subtitle: Text("Stops: ${route["stops"] ?? 0}"),
+                  ListTile(
+                    leading: const Icon(Icons.route),
 
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () {
-                    deleteRoute(route["id"]);
-                  },
-                ),
-              ),
+                    title: Text(route["name"] ?? ""),
 
-              const Divider(),
+                    subtitle: Text("Stops: ${route["stops"] ?? 0}"),
 
-            ],
-          );
-        },
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () {
+                        deleteRoute(route["id"]);
+                      },
+                    ),
+                  ),
+
+                  const Divider(),
+
+                ],
+              );
+            },
+          ),
+        ],
       ),
     );
   }

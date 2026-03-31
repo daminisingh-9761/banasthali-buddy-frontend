@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'admin_dashboard_screen.dart';
 import 'admin_users_screen.dart';
 import 'admin_routes_screen.dart';
-import 'admin_settings_screen.dart';
+import 'admin_manage_posts.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
@@ -19,7 +19,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     const AdminDashboard(),
     const AdminUsersScreen(),
     const AdminRoutesScreen(),
-    const AdminSettingsScreen(),
+    const AdminManagePostsScreen(),
   ];
 
   @override
@@ -32,11 +32,16 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         currentIndex: currentIndex,
         selectedItemColor: const Color(0xFF2F6F6D),
         unselectedItemColor: Colors.grey,
+
+        /// 🔥 Equal spacing fix
+        type: BottomNavigationBarType.fixed,
+
         onTap: (index){
           setState(() {
             currentIndex = index;
           });
         },
+
         items: const [
 
           BottomNavigationBarItem(
@@ -53,10 +58,9 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             icon: Icon(Icons.route),
             label: "Routes",
           ),
-
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: "Settings",
+            icon: Icon(Icons.store),
+            label: "Posts",
           ),
         ],
       ),
