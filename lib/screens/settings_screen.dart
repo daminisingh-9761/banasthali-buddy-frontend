@@ -148,30 +148,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                   /// 👨‍💼 ADMIN
                   if (role == "admin") ...[
-                    _tile(context, "Manage Users", Icons.supervisor_account, () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Manage Users")),
-                      );
-                    }),
-
-                    _tile(context, "Manage Routes", Icons.route, () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Manage Routes")),
-                      );
-                    }),
-                    _tile(context, "Manage Posts", Icons.route, () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Manage Posts")),
-                      );
-                    }),
-
-                    _tile(context, "View Reports", Icons.bar_chart, () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("View Reports")),
-                      );
-                    }),
+                    ///no extra  content
                   ],
-
                   const SizedBox(height: 20),
 
                   /// 🚪 LOGOUT

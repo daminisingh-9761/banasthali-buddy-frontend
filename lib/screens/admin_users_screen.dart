@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/admin_api_service.dart';
+import 'admin_home_screen.dart'; // ✅ ADD THIS
 
 class AdminUsersScreen extends StatefulWidget {
   const AdminUsersScreen({super.key});
@@ -21,7 +22,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
   // Load users from backend
   void loadUsers() async {
 
-    String token = "YOUR_JWT_TOKEN"; // later replace with stored token
+    String token = "YOUR_JWT_TOKEN";
 
     final data = await AdminApiService.getUsers();
 
@@ -37,78 +38,90 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
 
     await AdminApiService.deleteUser(id);
 
-    loadUsers(); // refresh list
+    loadUsers();
   }
 
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2F6F6D),
-        title: const Text("Manage Users",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            shadows: [
-              Shadow(
-                blurRadius: 4,
-                color: Colors.black26,
-                offset: Offset(1, 2),
-              ),
-            ],
-          ),
-        ),
-        centerTitle: true,
-      ),
+    return WillPopScope(   // ✅ ADDED
+      onWillPop: () async {
 
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const AdminHomeScreen()),
+        );
 
-      /// 🔹 BODY WITH BACKGROUND
-      body: Stack(
-        children: [
+        return false;
+      },
 
-          /// 🔹 BACKGROUND IMAGE
-          Positioned.fill(
-            child: Image.asset(
-              "assets/images/route.jpeg",
-              fit: BoxFit.cover,
+      child: Scaffold(
+
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF2F6F6D),
+          title: const Text("Manage Users",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              shadows: [
+                Shadow(
+                  blurRadius: 4,
+                  color: Colors.black26,
+                  offset: Offset(1, 2),
+                ),
+              ],
             ),
           ),
+          centerTitle: true,
+        ),
 
-          /// 🔹 ORIGINAL LIST
-          ListView.builder(
-            itemCount: users.length,
-            itemBuilder: (context, index){
+        /// 🔹 BODY WITH BACKGROUND
+        body: Stack(
+          children: [
 
-              final user = users[index];
+            /// 🔹 BACKGROUND IMAGE
+            Positioned.fill(
+              child: Image.asset(
+                "assets/images/route.jpeg",
+                fit: BoxFit.cover,
+              ),
+            ),
 
-              return Column(
-                children: [
+            /// 🔹 ORIGINAL LIST
+            ListView.builder(
+              itemCount: users.length,
+              itemBuilder: (context, index){
 
-                  ListTile(
-                    leading: const CircleAvatar(
-                      child: Icon(Icons.person),
+                final user = users[index];
+
+                return Column(
+                  children: [
+
+                    ListTile(
+                      leading: const CircleAvatar(
+                        child: Icon(Icons.person),
+                      ),
+
+                      title: Text(user["username"] ?? ""),
+
+                      subtitle: Text(user["role"] ?? ""),
+
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          deleteUser(user["id"]);
+                        },
+                      ),
                     ),
 
-                    title: Text(user["username"] ?? ""),
+                    const Divider(),
 
-                    subtitle: Text(user["role"] ?? ""),
-
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () {
-                        deleteUser(user["id"]);
-                      },
-                    ),
-                  ),
-
-                  const Divider(),
-
-                ],
-              );
-            },
-          ),
-        ],
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

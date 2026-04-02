@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/admin_api_service.dart';
+import 'admin_home_screen.dart'; // ✅ ADD THIS
 
 class AdminRoutesScreen extends StatefulWidget {
   const AdminRoutesScreen({super.key});
@@ -21,7 +22,7 @@ class _AdminRoutesScreenState extends State<AdminRoutesScreen> {
   // Load routes from backend
   void loadRoutes() async {
 
-    String token = "YOUR_JWT_TOKEN"; // replace later with stored token
+    String token = "YOUR_JWT_TOKEN";
 
     final data = await AdminApiService.getRoutes();
 
@@ -43,79 +44,87 @@ class _AdminRoutesScreenState extends State<AdminRoutesScreen> {
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2F6F6D),
-        title: const Text("Manage Routes",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            shadows: [
-              Shadow(
-                blurRadius: 4,
-                color: Colors.black26,
-                offset: Offset(1, 2),
-              ),
-            ],
-          ),
-        ),
-        centerTitle: true,
-      ),
+    return WillPopScope(   // ✅ ADDED
+      onWillPop: () async {
 
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const AdminHomeScreen()),
+        );
 
+        return false;
+      },
 
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF2F6F6D),
-        onPressed: () {
-          print("Add route pressed");
-        },
-        child: const Icon(Icons.add),
-      ),
-
-      /// 🔹 BODY WITH BACKGROUND
-      body: Stack(
-        children: [
-
-          /// 🔹 BACKGROUND IMAGE
-          Positioned.fill(
-            child: Image.asset(
-              "assets/images/route.jpeg",
-              fit: BoxFit.cover,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF2F6F6D),
+          title: const Text("Manage Routes",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              shadows: [
+                Shadow(
+                  blurRadius: 4,
+                  color: Colors.black26,
+                  offset: Offset(1, 2),
+                ),
+              ],
             ),
           ),
+          centerTitle: true,
+        ),
 
-          /// 🔹 ORIGINAL LIST
-          ListView.builder(
-            itemCount: routes.length,
-            itemBuilder: (context, index){
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: const Color(0xFF2F6F6D),
+          onPressed: () {
+            print("Add route pressed");
+          },
+          child: const Icon(Icons.add),
+        ),
 
-              final route = routes[index];
+        /// 🔹 BODY WITH BACKGROUND
+        body: Stack(
+          children: [
 
-              return Column(
-                children: [
+            Positioned.fill(
+              child: Image.asset(
+                "assets/images/route.jpeg",
+                fit: BoxFit.cover,
+              ),
+            ),
 
-                  ListTile(
-                    leading: const Icon(Icons.route),
+            ListView.builder(
+              itemCount: routes.length,
+              itemBuilder: (context, index){
 
-                    title: Text(route["name"] ?? ""),
+                final route = routes[index];
 
-                    subtitle: Text("Stops: ${route["stops"] ?? 0}"),
+                return Column(
+                  children: [
 
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () {
-                        deleteRoute(route["id"]);
-                      },
+                    ListTile(
+                      leading: const Icon(Icons.route),
+
+                      title: Text(route["name"] ?? ""),
+
+                      subtitle: Text("Stops: ${route["stops"] ?? 0}"),
+
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          deleteRoute(route["id"]);
+                        },
+                      ),
                     ),
-                  ),
 
-                  const Divider(),
+                    const Divider(),
 
-                ],
-              );
-            },
-          ),
-        ],
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

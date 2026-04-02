@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import 'admin_home_screen.dart'; // ✅ ADD THIS
 
 class AdminManagePostsScreen extends StatefulWidget {
   const AdminManagePostsScreen({super.key});
@@ -22,7 +23,7 @@ class _AdminManagePostsScreenState extends State<AdminManagePostsScreen> {
   Future<void> loadItems() async {
     final data = await ApiService.getAllItems();
 
-    if (!mounted) return; // ✅ ADD
+    if (!mounted) return;
 
     setState(() {
       items = data;
@@ -37,113 +38,135 @@ class _AdminManagePostsScreenState extends State<AdminManagePostsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
 
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2F6F6D),
-        title: const Text("Manage Posts"),
-        centerTitle: true,
-      ),
+    return WillPopScope(   // ✅ ADDED
+      onWillPop: () async {
 
-      body: Stack(
-        children: [
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const AdminHomeScreen()),
+        );
 
-          Positioned.fill(
-            child: IgnorePointer(
-              child: Image.asset(
-                "assets/images/route.jpeg",
-                fit: BoxFit.cover,
+        return false;
+      },
+
+      child: Scaffold(
+
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF2F6F6D),
+          title: const Text("Manage Posts",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              shadows: [
+                Shadow(
+                  blurRadius: 4,
+                  color: Colors.black26,
+                  offset: Offset(1, 2),
+                ),
+              ],
+            ),
+          ),
+          centerTitle: true,
+        ),
+
+        body: Stack(
+          children: [
+
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Image.asset(
+                  "assets/images/route.jpeg",
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-          ),
 
-          Padding(
-            padding: const EdgeInsets.all(16),
+            Padding(
+              padding: const EdgeInsets.all(16),
 
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : items.isEmpty // ✅ ADD (empty state)
-                ? const Center(child: Text("No items found"))
-                : ListView.builder(
-              itemCount: items.length,
-              itemBuilder: (context, index){
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : items.isEmpty
+                  ? const Center(child: Text("No items found"))
+                  : ListView.builder(
+                itemCount: items.length,
+                itemBuilder: (context, index){
 
-                final item = items[index];
+                  final item = items[index];
 
-                return Stack(
-                  children: [
+                  return Stack(
+                    children: [
 
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 15),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.85),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 15),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.85),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
 
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
 
-                          Text(
-                            item["title"] ?? "",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                            Text(
+                              item["title"] ?? "",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
 
-                          const SizedBox(height: 5),
+                            const SizedBox(height: 5),
 
-                          Text(item["description"] ?? ""),
+                            Text(item["description"] ?? ""),
 
-                          const SizedBox(height: 5),
+                            const SizedBox(height: 5),
 
-                          Text("₹${item["price"]}"),
+                            Text("₹${item["price"]}"),
 
-                          const SizedBox(height: 10),
+                            const SizedBox(height: 10),
 
-                          /// SELLER INFO
-                          Text("Phone: ${item["sellerPhone"] ?? ""}"),
-                          Text("Hostel: ${item["sellerHostel"] ?? ""}"),
-                          Text("Room: ${item["sellerRoom"] ?? ""}"),
+                            Text("Phone: ${item["sellerPhone"] ?? ""}"),
+                            Text("Hostel: ${item["sellerHostel"] ?? ""}"),
+                            Text("Room: ${item["sellerRoom"] ?? ""}"),
 
-                          const SizedBox(height: 10),
+                            const SizedBox(height: 10),
 
-                          /// DELETE BUTTON
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: item["id"] == null
-                                  ? null // ✅ SAFE CHECK
-                                  : () => deleteItem(item["id"]),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                onPressed: item["id"] == null
+                                    ? null
+                                    : () => deleteItem(item["id"]),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    /// SOLD BADGE
-                    if (item["sold"] == true)
-                      Positioned(
-                        top: 5,
-                        right: 10,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          color: Colors.red,
-                          child: const Text(
-                            "SOLD",
-                            style: TextStyle(color: Colors.white),
-                          ),
+                          ],
                         ),
                       ),
-                  ],
-                );
-              },
+
+                      if (item["sold"] == true)
+                        Positioned(
+                          top: 5,
+                          right: 10,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            color: Colors.red,
+                            child: const Text(
+                              "SOLD",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
