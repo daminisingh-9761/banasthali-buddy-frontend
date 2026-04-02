@@ -49,8 +49,18 @@ class _RideRequestScreenState
 
     if(token == null) return;
 
-    bookings =
+    List all =
     await ApiService.getDriverBookings(token!);
+
+    /// show only PENDING rides
+
+    bookings =
+        all.where(
+
+                (b)=>
+            b["status"]=="PENDING"
+
+        ).toList();
 
     if (!mounted) return;
 
@@ -59,6 +69,7 @@ class _RideRequestScreenState
       isLoading = false;
 
     });
+
   }
 
 

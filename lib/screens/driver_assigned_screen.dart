@@ -86,13 +86,33 @@ class _DriverAssignedScreenState extends State<DriverAssignedScreen> {
 
             ElevatedButton(
               child: const Text("Chat with Driver"),
+
               onPressed: () {
+
+                String bookingId =
+                rides.last["id"].toString();
+
+                // 🔴 ADD THIS LINE
+                print("BOOKING ID PASSING TO CHAT: $bookingId");
+
                 Navigator.push(
+
                   context,
+
                   MaterialPageRoute(
-                    builder: (_) => const ChatScreen(),
+
+                    builder: (_)
+
+                    => ChatScreen(
+
+                      bookingId: bookingId,
+
+                    ),
+
                   ),
+
                 );
+
               },
             ),
           ],

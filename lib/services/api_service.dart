@@ -133,28 +133,44 @@ class ApiService {
   // DRIVER ONLINE STATUS
   // ===============================
   static Future<Map<String,dynamic>> driverOnline(
-      String token
+      String token,
+      bool isOnline
       ) async {
 
     final response = await http.patch(
-        Uri.parse("https://banasthali-buddy.onrender.com/api/driver/status"),
-        headers: {
-          "Authorization": "Bearer $token",
-          "Content-Type": "application/json"
-        },
-        body: jsonEncode({
-          "online": true
-        })
+
+      Uri.parse(
+          "https://banasthali-buddy.onrender.com/api/driver/status"
+      ),
+
+      headers: {
+
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json"
+
+      },
+
+      body: jsonEncode({
+
+        "online": isOnline
+
+      }),
+
     );
 
     print("STATUS: ${response.statusCode}");
     print("BODY: ${response.body}");
 
     if (response.statusCode == 200) {
+
       return jsonDecode(response.body);
+
     } else {
-      return {}; // crash avoid
+
+      return {};
+
     }
+
   }
 
 

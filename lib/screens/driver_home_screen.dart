@@ -73,8 +73,10 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
 
     if(token == null) return;
 
-    await ApiService
-        .driverOnline(token!);
+    await ApiService.driverOnline(
+        token!,
+        value
+    );
 
     setState(() {
 

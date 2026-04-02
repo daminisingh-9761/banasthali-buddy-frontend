@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../services/api_service.dart';
 
 class DriverAvailabilityScreen extends StatefulWidget {
   const DriverAvailabilityScreen({super.key});
@@ -78,20 +80,47 @@ class _DriverAvailabilityScreenState extends State<DriverAvailabilityScreen> {
                     Switch(
                       value: isAvailable,
                       activeColor: const Color(0xFF2F6F6D),
-                      onChanged: (value) {
+                      onChanged: (value) async {
+
                         setState(() {
+
                           isAvailable = value;
+
                         });
 
+                        final prefs =
+                        await SharedPreferences.getInstance();
+
+                        String? token =
+                        prefs.getString("token");
+
+                        if(token != null){
+
+                          await ApiService.driverOnline(
+
+                              token,
+                              value
+
+                          );
+
+                        }
+
                         ScaffoldMessenger.of(context).showSnackBar(
+
                           SnackBar(
+
                             content: Text(
-                              isAvailable
-                                  ? "You are now ONLINE"
-                                  : "You are now OFFLINE",
+
+                                value
+                                    ? "Driver ONLINE"
+                                    : "Driver OFFLINE"
+
                             ),
+
                           ),
+
                         );
+
                       },
                     ),
 
