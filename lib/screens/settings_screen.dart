@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screens/student_exchange_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'login_screen.dart';
 import 'edit_profile_screen.dart';
 import 'my_items_screen.dart';
@@ -7,6 +8,7 @@ import 'student_ride_history_screen.dart';
 import 'driver_ride_history_screen.dart';
 import 'vehicle_details_screen.dart';
 import 'driver_availability_screen.dart';
+
 
 class SettingsScreen extends StatefulWidget {
   final String role;
@@ -240,26 +242,52 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   /// 🔹 LOGOUT
+  /// 🔹 LOGOUT
   Widget _logoutTile(BuildContext context) {
+
     return Card(
+
       shape: RoundedRectangleBorder(
+
         borderRadius: BorderRadius.circular(15),
+
       ),
+
       child: ListTile(
+
         leading: const Icon(Icons.logout, color: Colors.red),
+
         title: const Text("Logout"),
-        onTap: () {
+
+        onTap: () async {
+
+          // clear saved login token
+
+          final prefs = await SharedPreferences.getInstance();
+
+          await prefs.clear();
+
+          // go to login screen
 
           Navigator.pushAndRemoveUntil(
+
             context,
+
             MaterialPageRoute(
+
               builder: (_) => const LoginScreen(),
+
             ),
+
                 (route) => false,
+
           );
 
         },
+
       ),
+
     );
+
   }
 }
