@@ -43,16 +43,12 @@ class AdminApiService {
 
       return {
         "students": data["totalUsers"] ?? 0,
-        "drivers": data["totalDrivers"] ?? 0,   // IMPORTANT CHANGE
+        "drivers": data["totalDrivers"] ?? 0,
         "activeRides": 0,
         "listings": data["totalItems"] ?? 0
       };
 
     } else {
-<<<<<<< HEAD
-      print("ERROR: ${response.body}");
-      return {};
-=======
 
       return {
         "students": 0,
@@ -61,7 +57,6 @@ class AdminApiService {
         "listings": 0,
       };
 
->>>>>>> e5b906a8ab2cd601875a07b1f43a4cb24d2aa14f
     }
   }
 
@@ -84,7 +79,6 @@ class AdminApiService {
 
     print("USERS STATUS: ${response.statusCode}");
     print("USERS BODY: ${response.body}");
-<<<<<<< HEAD
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -94,40 +88,18 @@ class AdminApiService {
     }
   }
 
-=======
-
-    final data = jsonDecode(response.body);
-
-    if (data is List) {
-      return data;
-    } else if (data["data"] != null) {
-      return data["data"];
-    } else if (data["users"] != null) {
-      return data["users"];
-    } else {
-      return [];
-    }
-
-  }
-
->>>>>>> e5b906a8ab2cd601875a07b1f43a4cb24d2aa14f
   /// ================= DELETE USER =================
   static Future<bool> deleteUser(String id) async {
 
     final token = await getToken();
 
-<<<<<<< HEAD
     if (token == null || token.isEmpty) {
       print("ERROR: Token missing");
       return false;
     }
 
     final response = await http.delete(
-      Uri.parse("$baseUrl/users/$id"),
-=======
-    await http.delete(
-      Uri.parse("$baseUrl/api/admin/user/$id"), // FIXED
->>>>>>> e5b906a8ab2cd601875a07b1f43a4cb24d2aa14f
+      Uri.parse("$baseUrl/api/admin/user/$id"),
       headers: {
         "Authorization": "Bearer $token"
       },
@@ -149,7 +121,7 @@ class AdminApiService {
     }
 
     final response = await http.get(
-      Uri.parse("$baseUrl/api/admin/items"), // FIXED
+      Uri.parse("$baseUrl/api/admin/items"),
       headers: {
         "Authorization": "Bearer $token"
       },
@@ -166,8 +138,7 @@ class AdminApiService {
     }
   }
 
-<<<<<<< HEAD
-  /// ================= DELETE ROUTE =================
+  /// ================= DELETE ITEM =================
   static Future<bool> deleteRoute(String id) async {
 
     final token = await getToken();
@@ -178,17 +149,7 @@ class AdminApiService {
     }
 
     final response = await http.delete(
-      Uri.parse("$baseUrl/routes/$id"),
-=======
-
-  /// ================= DELETE ITEM =================
-  static Future deleteRoute(String id) async {
-
-    final token = await getToken();
-
-    await http.delete(
-      Uri.parse("$baseUrl/api/admin/item/$id"), // FIXED
->>>>>>> e5b906a8ab2cd601875a07b1f43a4cb24d2aa14f
+      Uri.parse("$baseUrl/api/admin/item/$id"),
       headers: {
         "Authorization": "Bearer $token"
       },
