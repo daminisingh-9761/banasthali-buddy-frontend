@@ -8,6 +8,9 @@ import 'student_ride_history_screen.dart';
 import 'driver_ride_history_screen.dart';
 import 'vehicle_details_screen.dart';
 import 'driver_availability_screen.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 
 
 class SettingsScreen extends StatefulWidget {
@@ -138,13 +141,52 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       );
                     }),
 
-                    _tile(context, "Availability", Icons.toggle_on, () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const DriverAvailabilityScreen(),
+                    _tile(context, "Availability", Icons.toggle_on, () async {
+
+                      final prefs = await SharedPreferences.getInstance();
+
+                      final token = prefs.getString("token");
+
+                      isAvailable = !isAvailable;
+
+                      await http.patch(
+
+                        Uri.parse(
+                            "https://banasthali-buddy.onrender.com/api/users/driver/availability"
                         ),
+
+                        headers: {
+
+                          "Authorization": "Bearer $token",
+
+                          "Content-Type": "application/json"
+
+                        },
+
+                        body: jsonEncode({
+
+                          "available": isAvailable
+
+                        }),
+
                       );
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+
+                        SnackBar(
+
+                          content: Text(
+
+                              isAvailable
+                                  ? "Driver Online"
+                                  : "Driver Offline"
+
+                          ),
+
+                        ),
+
+                      );
+
                     }),
                   ],
 
@@ -182,66 +224,184 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   /// 🔹 PASSWORD DIALOG
   static void _showChangePasswordDialog(BuildContext context) {
+
     TextEditingController oldPass = TextEditingController();
+
     TextEditingController newPass = TextEditingController();
+
     TextEditingController confirmPass = TextEditingController();
 
     showDialog(
+
       context: context,
+
       builder: (_) => AlertDialog(
+
         title: const Text("Change Password"),
+
         content: Column(
+
           mainAxisSize: MainAxisSize.min,
+
           children: [
 
             TextField(
+
               controller: oldPass,
+
               obscureText: true,
-              decoration: const InputDecoration(labelText: "Old Password"),
+
+              decoration: const InputDecoration(
+
+                  labelText: "Old Password"
+
+              ),
+
             ),
 
             TextField(
+
               controller: newPass,
+
               obscureText: true,
-              decoration: const InputDecoration(labelText: "New Password"),
+
+              decoration: const InputDecoration(
+
+                  labelText: "New Password"
+
+              ),
+
             ),
 
             TextField(
-              controller: confirmPass,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: "Confirm Password"),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          ElevatedButton(
-            onPressed: () {
 
-              if (newPass.text != confirmPass.text) {
+              controller: confirmPass,
+
+              obscureText: true,
+
+              decoration: const InputDecoration(
+
+                  labelText: "Confirm Password"
+
+              ),
+
+            ),
+
+          ],
+
+        ),
+
+        actions: [
+
+          TextButton(
+
+            onPressed: () => Navigator.pop(context),
+
+            child: const Text("Cancel"),
+
+          ),
+
+          ElevatedButton(
+
+            onPressed: () async {
+
+              if(newPass.text != confirmPass.text){
+
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Passwords do not match")),
+
+                  const SnackBar(
+
+                      content: Text("Passwords do not match")
+
+                  ),
+
                 );
+
                 return;
+
               }
 
-              Navigator.pop(context);
+              try{
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Password Updated")),
-              );
+                final prefs =
+                await SharedPreferences.getInstance();
+
+                final token =
+                prefs.getString("token");
+
+                await http.put(
+
+                  Uri.parse(
+
+                      "https://banasthali-buddy.onrender.com/api/users/change-password"
+
+                  ),
+
+                  headers:{
+
+                    "Authorization":
+                    "Bearer $token",
+
+                    "Content-Type":
+                    "application/json"
+
+                  },
+
+                  body: jsonEncode({
+
+                    "password":
+                    newPass.text
+
+                  }),
+
+                );
+
+                Navigator.pop(context);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+
+                  const SnackBar(
+
+                      content: Text("Password updated")
+
+                  ),
+
+                );
+
+              }
+
+              catch(e){
+
+                ScaffoldMessenger.of(context).showSnackBar(
+
+                  SnackBar(
+
+                    content: Text(
+
+                        "Error: $e"
+
+                    ),
+
+                  ),
+
+                );
+
+              }
+
             },
+
             child: const Text("Update"),
+
           ),
+
         ],
+
       ),
+
     );
+
   }
 
-  /// 🔹 LOGOUT
   /// 🔹 LOGOUT
   Widget _logoutTile(BuildContext context) {
 
