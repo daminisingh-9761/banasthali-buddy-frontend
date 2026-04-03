@@ -13,9 +13,7 @@ class RideHistoryScreen extends StatefulWidget {
 class _RideHistoryScreenState extends State<RideHistoryScreen> {
 
   List rideHistory = [];
-
   String? token;
-
   bool isLoading = true;
 
   @override
@@ -25,7 +23,6 @@ class _RideHistoryScreenState extends State<RideHistoryScreen> {
   }
 
   Future<void> loadToken() async {
-
     final prefs =
     await SharedPreferences.getInstance();
 
@@ -33,310 +30,204 @@ class _RideHistoryScreenState extends State<RideHistoryScreen> {
         prefs.getString("token");
 
     loadRideHistory();
-
   }
-
 
   Future<void> loadRideHistory() async {
 
     if(token == null){
-
       setState(() {
         isLoading = false;
       });
-
       return;
-
     }
 
     List all =
     await ApiService.getDriverBookings(token!);
 
-    /// only COMPLETED rides
-
     rideHistory =
         all.where(
-
-                (b) =>
-            b["status"] == "COMPLETED"
-
+                (b) => b["status"] == "COMPLETED"
         ).toList();
 
-
     setState(() {
-
       isLoading = false;
-
     });
-
   }
-
 
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
 
-      backgroundColor:
-      const Color(0xFF2F6F6D),
-
-      body: Column(
-
+      /// 🔹 FULL BACKGROUND IMAGE
+      body: Stack(
         children: [
 
-          const SizedBox(height: 70),
+          Positioned.fill(
+            child: Image.asset(
+              "assets/images/route.jpeg",
+              fit: BoxFit.cover,
+            ),
+          ),
 
-          Row(
-
+          Column(
             children: [
 
-              IconButton(
+              const SizedBox(height: 70),
 
-                onPressed: () {
+              /// 🔵 HEADER (UPDATED)
+              Row(
+                children: [
 
-                  Navigator.pop(context);
-
-                },
-
-                icon: const Icon(
-
-                  Icons.arrow_back,
-                  color: Colors.white,
-
-                ),
-
-              ),
-
-              const Expanded(
-
-                child: Text(
-
-                  "Ride History",
-
-                  textAlign: TextAlign.center,
-
-                  style: TextStyle(
-
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                    ),
                   ),
 
-                ),
-
-              ),
-
-              const SizedBox(width: 48),
-
-            ],
-
-          ),
-
-          const SizedBox(height: 20),
-
-          Expanded(
-
-            child: Container(
-
-              padding:
-              const EdgeInsets.all(25),
-
-              decoration:
-              const BoxDecoration(
-
-                color:
-                Color(0xFFE6F4F1),
-
-                borderRadius:
-                BorderRadius.only(
-
-                  topLeft:
-                  Radius.circular(40),
-
-                  topRight:
-                  Radius.circular(40),
-
-                ),
-
-              ),
-
-              child:
-
-              isLoading
-
-                  ? const Center(
-
-                child:
-                CircularProgressIndicator(),
-
-              )
-
-                  :
-
-              rideHistory.isEmpty
-
-                  ? const Center(
-
-                child: Text(
-
-                  "No Ride History Available",
-
-                ),
-
-              )
-
-                  :
-
-              ListView.builder(
-
-                itemCount:
-                rideHistory.length,
-
-                itemBuilder:
-                    (context, index) {
-
-                  final ride =
-                  rideHistory[index];
-
-                  return Card(
-
-                    shape:
-                    RoundedRectangleBorder(
-
-                      borderRadius:
-                      BorderRadius.circular(15),
-
-                    ),
-
-                    margin:
-                    const EdgeInsets.only(
-                        bottom: 15),
-
-                    child: Padding(
-
-                      padding:
-                      const EdgeInsets.all(15),
-
-                      child: Column(
-
-                        crossAxisAlignment:
-                        CrossAxisAlignment.start,
-
-                        children: [
-
-                          Text(
-
-                            "Passenger ID: ${ride["passengerId"]}",
-
-                            style:
-                            const TextStyle(
-
-                              fontWeight:
-                              FontWeight.bold,
-
-                            ),
-
+                  const Expanded(
+                    child: Text(
+                      "Ride History",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        shadows: [
+                          Shadow(
+                            blurRadius: 4,
+                            color: Colors.black26,
+                            offset: Offset(1, 2),
                           ),
-
-                          const SizedBox(height: 5),
-
-                          Text(
-
-                            "${ride["pickupPostId"]} → ${ride["destinationPostId"]}",
-
-                          ),
-
-                          const SizedBox(height: 5),
-
-                          Text(
-
-                            "Status: ${ride["status"]}",
-
-                          ),
-
                         ],
-
                       ),
-
                     ),
+                  ),
 
-                  );
-
-                },
-
+                  const SizedBox(width: 48),
+                ],
               ),
 
-            ),
+              const SizedBox(height: 20),
 
-          ),
+              /// 🔹 CONTENT CONTAINER
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(25),
 
-          Container(
-
-            color:
-            const Color(0xFFE6F4F1),
-
-            padding:
-            const EdgeInsets.fromLTRB(
-                25,
-                0,
-                25,
-                25),
-
-            child: SizedBox(
-
-              width:
-              double.infinity,
-
-              height: 50,
-
-              child: ElevatedButton(
-
-                style:
-                ElevatedButton.styleFrom(
-
-                  backgroundColor:
-                  Colors.grey.shade700,
-
-                ),
-
-                onPressed: () {
-
-                  Navigator.pushAndRemoveUntil(
-
-                    context,
-
-                    MaterialPageRoute(
-
-                      builder: (_) =>
-                      const DriverHomeScreen(),
-
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.85), // ✅ FIX
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(40),
+                      topRight: Radius.circular(40),
                     ),
+                  ),
 
-                        (route) => false,
+                  child:
+                  isLoading
+                      ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                      :
+                  rideHistory.isEmpty
+                      ? const Center(
+                    child: Text(
+                      "No Ride History Available",
+                    ),
+                  )
+                      :
+                  ListView.builder(
+                    itemCount: rideHistory.length,
+                    itemBuilder:
+                        (context, index) {
 
-                  );
+                      final ride =
+                      rideHistory[index];
 
-                },
+                      return Card(
+                        color: Colors.white.withOpacity(0.9), // ✅ visibility
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                          BorderRadius.circular(15),
+                        ),
+                        margin:
+                        const EdgeInsets.only(bottom: 15),
 
-                child: const Text(
+                        child: Padding(
+                          padding:
+                          const EdgeInsets.all(15),
 
-                  "Go to Driver Dashboard",
+                          child: Column(
+                            crossAxisAlignment:
+                            CrossAxisAlignment.start,
 
+                            children: [
+
+                              Text(
+                                "Passenger ID: ${ride["passengerId"]}",
+                                style: const TextStyle(
+                                  fontWeight:
+                                  FontWeight.bold,
+                                ),
+                              ),
+
+                              const SizedBox(height: 5),
+
+                              Text(
+                                "${ride["pickupPostId"]} → ${ride["destinationPostId"]}",
+                              ),
+
+                              const SizedBox(height: 5),
+
+                              Text(
+                                "Status: ${ride["status"]}",
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
-
               ),
 
-            ),
+              /// 🔹 BUTTON SECTION
+              Container(
+                color: Colors.white.withOpacity(0.85), // ✅ FIX
+                padding: const EdgeInsets.fromLTRB(25, 0, 25, 25),
 
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 50,
+
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2F6F6D),
+                    ),
+                    onPressed: () {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                          const DriverHomeScreen(),
+                        ),
+                            (route) => false,
+                      );
+                    },
+                    child: const Text(
+                      "Go to Driver Dashboard",
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-
         ],
-
       ),
-
     );
-
   }
-
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/admin_api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'admin_home_screen.dart'; // ✅ ADD THIS
 
 class AdminRoutesScreen extends StatefulWidget {
@@ -22,7 +23,8 @@ class _AdminRoutesScreenState extends State<AdminRoutesScreen> {
   // Load routes from backend
   void loadRoutes() async {
 
-    String token = "YOUR_JWT_TOKEN";
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token") ?? "";
 
     final data = await AdminApiService.getRoutes();
 
@@ -34,7 +36,8 @@ class _AdminRoutesScreenState extends State<AdminRoutesScreen> {
   // Delete route
   void deleteRoute(String id) async {
 
-    String token = "YOUR_JWT_TOKEN";
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token") ?? "";
 
     await AdminApiService.deleteRoute(id);
 
@@ -93,9 +96,11 @@ class _AdminRoutesScreenState extends State<AdminRoutesScreen> {
               ),
             ),
 
-            ListView.builder(
-              itemCount: routes.length,
-              itemBuilder: (context, index){
+        routes.isEmpty
+            ? const Center(child: Text("No routes found"))
+            : ListView.builder(
+            itemCount: routes.length,
+            itemBuilder: (context, index) {
 
                 final route = routes[index];
 

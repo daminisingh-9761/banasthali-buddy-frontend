@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/admin_api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'admin_home_screen.dart'; // ✅ ADD THIS
 
 class AdminUsersScreen extends StatefulWidget {
@@ -22,7 +23,8 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
   // Load users from backend
   void loadUsers() async {
 
-    String token = "YOUR_JWT_TOKEN";
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token") ?? "";
 
     final data = await AdminApiService.getUsers();
 
@@ -34,7 +36,8 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
   // Delete user
   void deleteUser(String id) async {
 
-    String token = "YOUR_JWT_TOKEN";
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token") ?? "";
 
     await AdminApiService.deleteUser(id);
 

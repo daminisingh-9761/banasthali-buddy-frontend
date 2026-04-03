@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'admin_home_screen.dart'; // ✅ ADD THIS
+
 
 class AdminManagePostsScreen extends StatefulWidget {
   const AdminManagePostsScreen({super.key});
@@ -21,6 +23,8 @@ class _AdminManagePostsScreenState extends State<AdminManagePostsScreen> {
   }
 
   Future<void> loadItems() async {
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token") ?? "";
     final data = await ApiService.getAllItems();
 
     if (!mounted) return;
@@ -29,13 +33,24 @@ class _AdminManagePostsScreenState extends State<AdminManagePostsScreen> {
       items = data;
       isLoading = false;
     });
+    print("DATA: $items");
   }
 
   Future<void> deleteItem(String id) async {
-    await ApiService.deleteItem(id);
-    loadItems();
-  }
 
+    final success = await ApiService.deleteItem(id);
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Item deleted")),
+      );
+      loadItems();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Delete failed")),
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
 

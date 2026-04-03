@@ -155,287 +155,302 @@ class _ChatScreenState
 
       ),
 
-      body: Column(
-
+      /// 🔥 ONLY CHANGE BELOW (STACK ADDED)
+      body: Stack(
         children: [
 
-          Expanded(
+          /// 🔹 BACKGROUND IMAGE
+          Positioned.fill(
+            child: Image.asset(
+              "assets/images/route.jpeg",
+              fit: BoxFit.cover,
+            ),
+          ),
 
-            child: ListView.builder(
+          /// 🔹 ORIGINAL CONTENT (UNCHANGED)
+          Column(
 
-              controller: scrollController,
+            children: [
 
-              itemCount:
-              messages.length,
+              Expanded(
 
-              itemBuilder:
+                child: ListView.builder(
 
-                  (context,index){
+                  controller: scrollController,
 
-                var msg =
-                messages[index];
+                  itemCount:
+                  messages.length,
 
-                bool isMe =
+                  itemBuilder:
 
-                    msg["senderId"]
-                        ==
-                        "user";
+                      (context,index){
 
+                    var msg =
+                    messages[index];
 
-                return Align(
+                    bool isMe =
 
-                  alignment:
-
-                  isMe
-                      ?
-
-                  Alignment
-                      .centerRight
-
-                      :
-
-                  Alignment
-                      .centerLeft,
+                        msg["senderId"]
+                            ==
+                            "user";
 
 
-                  child: Container(
+                    return Align(
 
-                    margin:
-                    const EdgeInsets
-                        .symmetric(
-                        vertical: 6,
-                        horizontal: 10),
-
-                    padding:
-                    const EdgeInsets
-                        .symmetric(
-                        vertical: 10,
-                        horizontal: 14),
-
-
-                    decoration:
-                    BoxDecoration(
-
-                      color:
+                      alignment:
 
                       isMe
                           ?
 
-                      const Color(0xFF2F6F6D)
+                      Alignment
+                          .centerRight
 
                           :
 
-                      Colors.white,
+                      Alignment
+                          .centerLeft,
 
 
-                      borderRadius:
+                      child: Container(
 
-                      BorderRadius
-                          .circular(14),
+                        margin:
+                        const EdgeInsets
+                            .symmetric(
+                            vertical: 6,
+                            horizontal: 10),
 
-                      boxShadow: [
-
-                        BoxShadow(
-
-                            color:
-                            Colors.black12,
-
-                            blurRadius: 3
-
-                        )
-
-                      ],
-
-                    ),
+                        padding:
+                        const EdgeInsets
+                            .symmetric(
+                            vertical: 10,
+                            horizontal: 14),
 
 
-                    child:
+                        decoration:
+                        BoxDecoration(
 
-                    Column(
+                          color:
 
-                      crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                          isMe
+                              ?
 
-                      children: [
+                          const Color(0xFF2F6F6D)
 
-                        Text(
+                              :
 
-                          msg["message"],
+                          Colors.white,
 
-                          style: TextStyle(
 
-                            color:
-                            isMe
-                                ?
+                          borderRadius:
 
-                            Colors.white
-                                :
+                          BorderRadius
+                              .circular(14),
 
-                            Colors.black87,
+                          boxShadow: [
 
-                            fontSize: 15,
+                            BoxShadow(
+
+                                color:
+                                Colors.black12,
+
+                                blurRadius: 3
+
+                            )
+
+                          ],
+
+                        ),
+
+
+                        child:
+
+                        Column(
+
+                          crossAxisAlignment:
+                          CrossAxisAlignment.start,
+
+                          children: [
+
+                            Text(
+
+                              msg["message"],
+
+                              style: TextStyle(
+
+                                color:
+                                isMe
+                                    ?
+
+                                Colors.white
+                                    :
+
+                                Colors.black87,
+
+                                fontSize: 15,
+
+                              ),
+
+                            ),
+
+                            const SizedBox(height: 4),
+
+                            Text(
+
+                              msg["timestamp"]
+                                  .toString()
+                                  .substring(11,16),
+
+                              style: TextStyle(
+
+                                fontSize: 11,
+
+                                color:
+                                isMe
+                                    ?
+
+                                Colors.white70
+                                    :
+
+                                Colors.grey,
+
+                              ),
+
+                            )
+
+                          ],
+
+                        ),
+
+                      ),
+
+                    );
+
+                  },
+                ),
+              ),
+
+
+
+              Padding(
+
+                padding:
+                const EdgeInsets.all(8),
+
+                child: Row(
+
+                  children: [
+
+                    Expanded(
+
+                      child: TextField(
+
+                        controller:
+                        controller,
+
+                        decoration:
+
+                        InputDecoration(
+
+                          hintText:
+                          "Type message",
+
+                          filled: true,
+
+                          fillColor:
+                          Colors.white,
+
+                          contentPadding:
+                          const EdgeInsets
+                              .symmetric(
+                              horizontal: 16),
+
+                          border:
+                          OutlineInputBorder(
+
+                            borderRadius:
+                            BorderRadius.circular(30),
+
+                            borderSide:
+                            BorderSide.none,
 
                           ),
 
                         ),
 
-                        const SizedBox(height: 4),
-
-                        Text(
-
-                          msg["timestamp"]
-                              .toString()
-                              .substring(11,16),
-
-                          style: TextStyle(
-
-                            fontSize: 11,
-
-                            color:
-                            isMe
-                                ?
-
-                            Colors.white70
-                                :
-
-                            Colors.grey,
-
-                          ),
-
-                        )
-
-                      ],
-
-                    ),
-
-                  ),
-
-                );
-
-              },
-            ),
-          ),
-
-
-
-          Padding(
-
-            padding:
-            const EdgeInsets.all(8),
-
-            child: Row(
-
-              children: [
-
-                Expanded(
-
-                  child: TextField(
-
-                    controller:
-                    controller,
-
-                    decoration:
-
-                    InputDecoration(
-
-                      hintText:
-                      "Type message",
-
-                      filled: true,
-
-                      fillColor:
-                      Colors.white,
-
-                      contentPadding:
-                      const EdgeInsets
-                          .symmetric(
-                          horizontal: 16),
-
-                      border:
-                      OutlineInputBorder(
-
-                        borderRadius:
-                        BorderRadius.circular(30),
-
-                        borderSide:
-                        BorderSide.none,
-
                       ),
 
                     ),
 
-                  ),
+                    const SizedBox(width: 6),
+
+                    CircleAvatar(
+
+                      backgroundColor:
+                      const Color(0xFF2F6F6D),
+
+                      child:
+
+                      IconButton(
+
+                        icon:
+                        const Icon(
+                            Icons.send,
+                            color: Colors.white),
+
+                        onPressed: send,
+
+                      ),
+
+                    )
+
+                  ],
 
                 ),
 
-                const SizedBox(width: 6),
+              ),
 
-                CircleAvatar(
+
+
+              ElevatedButton(
+
+                style: ElevatedButton.styleFrom(
 
                   backgroundColor:
                   const Color(0xFF2F6F6D),
 
-                  child:
-
-                  IconButton(
-
-                    icon:
-                    const Icon(
-                        Icons.send,
-                        color: Colors.white),
-
-                    onPressed: send,
-
-                  ),
-
-                )
-
-              ],
-
-            ),
-
-          ),
-
-
-
-          ElevatedButton(
-
-            style: ElevatedButton.styleFrom(
-
-              backgroundColor:
-              const Color(0xFF2F6F6D),
-
-            ),
-
-            child:
-
-            const Text(
-                "Complete Booking"
-            ),
-
-            onPressed: () {
-
-              Navigator.pushReplacement(
-
-                context,
-
-                MaterialPageRoute(
-
-                  builder:
-
-                      (_)
-
-                  =>
-
-                  const BookingSuccessScreen(),
-
                 ),
-              );
-            },
+
+                child:
+
+                const Text(
+                    "Complete Booking"
+                ),
+
+                onPressed: () {
+
+                  Navigator.pushReplacement(
+
+                    context,
+
+                    MaterialPageRoute(
+
+                      builder:
+
+                          (_)
+
+                      =>
+
+                      const BookingSuccessScreen(),
+
+                    ),
+                  );
+                },
+              ),
+
+              const SizedBox(height: 10)
+
+            ],
           ),
-
-          const SizedBox(height: 10)
-
         ],
       ),
     );

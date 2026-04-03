@@ -24,7 +24,6 @@ class _DriverAssignedScreenState extends State<DriverAssignedScreen> {
     super.initState();
     loadRide();
 
-    /// 🔵 AUTO REFRESH EVERY 5 SECONDS
     timer = Timer.periodic(
       const Duration(seconds: 5),
           (Timer t) => loadRide(),
@@ -43,7 +42,7 @@ class _DriverAssignedScreenState extends State<DriverAssignedScreen> {
 
   @override
   void dispose() {
-    timer?.cancel();   // stop timer when screen closes
+    timer?.cancel();
     super.dispose();
   }
 
@@ -51,72 +50,109 @@ class _DriverAssignedScreenState extends State<DriverAssignedScreen> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Driver Assigned")),
 
-      body: loading
-          ? const Center(child: CircularProgressIndicator())
-          : rides.isEmpty
-          ? const Center(child: Text("No Ride Found"))
-          : Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-
-            Text(
-              "Pickup: ${rides.last["pickupPostId"]}",
-              style: const TextStyle(fontSize: 18),
-            ),
-
-            Text(
-              "Drop: ${rides.last["destinationPostId"]}",
-              style: const TextStyle(fontSize: 18),
-            ),
-
-            const SizedBox(height: 10),
-
-            Text(
-              "Ride Status: ${rides.last["status"]}",
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+      /// 🔵 HEADER (THEME + WHITE TEXT + SHADOW)
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF2F6F6D),
+        title: const Text(
+          "Driver Assigned",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            shadows: [
+              Shadow(
+                blurRadius: 4,
+                color: Colors.black26,
+                offset: Offset(1, 2),
               ),
+            ],
+          ),
+        ),
+        centerTitle: true,
+      ),
+
+      /// 🔹 BODY WITH BACKGROUND
+      body: Stack(
+        children: [
+
+          /// 🔹 FULL BACKGROUND
+          Positioned.fill(
+            child: Image.asset(
+              "assets/images/route.jpeg",
+              fit: BoxFit.cover,
             ),
+          ),
 
-            const SizedBox(height: 30),
+          /// 🔹 CONTENT (FIXED HEIGHT ISSUE)
+          SizedBox.expand(   // ✅ ADD THIS
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : rides.isEmpty
+                  ? const Center(child: Text("No Ride Found"))
+                  : Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
 
-            ElevatedButton(
-              child: const Text("Chat with Driver"),
-
-              onPressed: () {
-
-                String bookingId =
-                rides.last["id"].toString();
-
-                // 🔴 ADD THIS LINE
-                print("BOOKING ID PASSING TO CHAT: $bookingId");
-
-                Navigator.push(
-
-                  context,
-
-                  MaterialPageRoute(
-
-                    builder: (_)
-
-                    => ChatScreen(
-
-                      bookingId: bookingId,
-
+                  Container(
+                    padding: const EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(15),
                     ),
+                    child: Column(
+                      children: [
 
+                        Text(
+                          "Pickup: ${rides.last["pickupPostId"]}",
+                          style: const TextStyle(fontSize: 18),
+                        ),
+
+                        Text(
+                          "Drop: ${rides.last["destinationPostId"]}",
+                          style: const TextStyle(fontSize: 18),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        Text(
+                          "Ride Status: ${rides.last["status"]}",
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
 
-                );
+                  const SizedBox(height: 30),
 
-              },
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2F6F6D),
+                    ),
+                    child: const Text("Chat with Driver"),
+
+                    onPressed: () {
+                      String bookingId = rides.last["id"].toString();
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ChatScreen(
+                            bookingId: bookingId,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

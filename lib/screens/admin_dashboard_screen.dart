@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import '../services/admin_api_service.dart';
-import 'settings_screen.dart'; // ✅ ADD
+import 'settings_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+
+// ✅ ADDED IMPORTS
+import 'admin_users_screen.dart';
+import 'admin_routes_screen.dart';
+import 'admin_manage_posts.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -23,46 +30,53 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   void loadDashboard() async {
-    String token = "YOUR_JWT_TOKEN";
-
     final data = await AdminApiService.getDashboardStats();
 
+    if (data.isEmpty) {
+      print("Dashboard API failed");
+      return;
+    }
+
     setState(() {
-      students = data["students"];
-      drivers = data["drivers"];
-      rides = data["activeRides"];
-      listings = data["listings"];
+      students = data["students"] ?? 0;
+      drivers = data["drivers"] ?? 0;
+      rides = data["activeRides"] ?? 0;
+      listings = data["listings"] ?? 0;
     });
   }
 
-  Widget dashboardCard(String title, String value, IconData icon) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.85),
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+  // ✅ UPDATED FUNCTION (CLICKABLE CARD)
+  Widget dashboardCard(String title, String value, IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.85),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
 
-            Icon(icon, size: 35, color: const Color(0xFF2F6F6D)),
+              Icon(icon, size: 35, color: const Color(0xFF2F6F6D)),
 
-            const SizedBox(height: 10),
+              const SizedBox(height: 10),
 
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
 
-            const SizedBox(height: 5),
+              const SizedBox(height: 5),
 
-            Text(title),
-          ],
+              Text(title),
+            ],
+          ),
         ),
       ),
     );
@@ -89,18 +103,19 @@ class _AdminDashboardState extends State<AdminDashboard> {
           },
         ),
 
-        title: const Text("Admin Dashboard",
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          shadows: [
-            Shadow(
-              blurRadius: 4,
-              color: Colors.black26,
-              offset: Offset(1, 2),
-            ),
-          ],
-        ),
+        title: const Text(
+          "Admin Dashboard",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            shadows: [
+              Shadow(
+                blurRadius: 4,
+                color: Colors.black26,
+                offset: Offset(1, 2),
+              ),
+            ],
+          ),
         ),
         centerTitle: true,
       ),
@@ -109,7 +124,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
       body: Stack(
         children: [
 
-          /// 🔹 BACKGROUND IMAGE
           Positioned.fill(
             child: Image.asset(
               "assets/images/route.jpeg",
@@ -117,7 +131,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
             ),
           ),
 
-          /// 🔹 CONTENT
           Padding(
             padding: const EdgeInsets.all(16),
 
@@ -128,14 +141,37 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
               children: [
 
-                dashboardCard("Students", students.toString(), Icons.school),
+                // 👥 USERS
+                dashboardCard("Students", students.toString(), Icons.school, () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AdminUsersScreen()),
+                  );
+                }),
 
-                dashboardCard("Drivers", drivers.toString(), Icons.drive_eta),
+                // 👥 DRIVERS
+                dashboardCard("Drivers", drivers.toString(), Icons.drive_eta, () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AdminUsersScreen()),
+                  );
+                }),
 
-                dashboardCard("Active Rides", rides.toString(), Icons.directions_car),
+                // 🚗 ROUTES
+                dashboardCard("Active Rides", rides.toString(), Icons.directions_car, () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AdminRoutesScreen()),
+                  );
+                }),
 
-                dashboardCard("Listings", listings.toString(), Icons.store),
-
+                // 🛍️ POSTS
+                dashboardCard("Listings", listings.toString(), Icons.store, () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AdminManagePostsScreen()),
+                  );
+                }),
 
               ],
             ),

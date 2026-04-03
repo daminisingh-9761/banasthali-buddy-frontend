@@ -393,24 +393,20 @@ class ApiService {
     }
   }
   // delete items
-  static Future<void> deleteItem(String id) async {
-    try {
+  static Future<bool> deleteItem(String id) async {
 
-      final prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString("token");
+    final prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token") ?? "";
 
-      await http.delete(
-        Uri.parse("https://banasthali-buddy.onrender.com/api/items/$id"),
-        headers: {
-          "Authorization": "Bearer $token",
-        },
-      );
+    final response = await http.delete(
+      Uri.parse("https://banasthali-buddy.onrender.com/api/items/$id"),
+      headers: {
+        "Authorization": "Bearer $token"
+      },
+    );
 
-    } catch (e) {
-      print("DELETE ITEM ERROR: $e");
-    }
+    return response.statusCode == 200;
   }
-
   static Future<List> getAllItems() async {
     try {
 

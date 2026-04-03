@@ -20,11 +20,9 @@ class _UpdateGPSScreenState extends State<UpdateGPSScreen> {
 
   Timer? timer;
 
-  /// ✅ changed API endpoint
   String apiUrl =
       "https://banasthali-buddy-backend.onrender.com/api/driver/location";
 
-  /// start GPS sharing
   void startSharing() async {
 
     bool serviceEnabled =
@@ -40,10 +38,8 @@ class _UpdateGPSScreenState extends State<UpdateGPSScreen> {
     await Geolocator.checkPermission();
 
     if(permission == LocationPermission.denied){
-
       permission =
       await Geolocator.requestPermission();
-
     }
 
     setState(() {
@@ -52,68 +48,47 @@ class _UpdateGPSScreenState extends State<UpdateGPSScreen> {
     });
 
     timer = Timer.periodic(
-
       const Duration(seconds: 5),
-
           (timer) async {
 
         Position position =
         await Geolocator.getCurrentPosition();
 
-        /// ✅ changed POST → PUT
         await http.put(
-
           Uri.parse(apiUrl),
-
           headers: {
             "Content-Type":"application/json"
           },
-
-          /// ✅ removed busId
           body: jsonEncode({
-
             "latitude": position.latitude,
-
             "longitude": position.longitude
-
           }),
-
         );
 
         setState(() {
-
           lastUpdated =
               DateTime.now().toString();
-
         });
 
       },
-
     );
-
   }
 
-  /// stop GPS sharing
   void stopSharing(){
-
     timer?.cancel();
 
     setState(() {
-
       isSharing = false;
-
       locationStatus = "Location Sharing: OFF";
-
       lastUpdated = DateTime.now().toString();
-
     });
-
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF2F6F6D),
+
       body: Column(
         children: [
 
@@ -147,13 +122,19 @@ class _UpdateGPSScreenState extends State<UpdateGPSScreen> {
           Expanded(
             child: Container(
               padding: const EdgeInsets.all(25),
-              decoration: const BoxDecoration(
-                color: Color(0xFFE6F4F1),
-                borderRadius: BorderRadius.only(
+
+              /// 🔥 ONLY CHANGE HERE (BACKGROUND IMAGE)
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(40),
                   topRight: Radius.circular(40),
                 ),
+                image: const DecorationImage(
+                  image: AssetImage("assets/images/route.jpeg"),
+                  fit: BoxFit.cover,
+                ),
               ),
+
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
