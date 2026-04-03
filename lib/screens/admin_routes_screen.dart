@@ -112,7 +112,7 @@ class _AdminRoutesScreenState extends State<AdminRoutesScreen> {
 
                       title: Text(route["name"] ?? ""),
 
-                      subtitle: Text("Stops: ${route["stops"] ?? 0}"),
+                      subtitle: Text("Stops: ${route["stops"]?.length ?? 0}"),
 
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),
