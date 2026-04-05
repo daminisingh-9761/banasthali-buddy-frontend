@@ -32,6 +32,7 @@ class BookingService {
       }),
     );
 
+
     print("STATUS CODE: ${response.statusCode}");
     print("RESPONSE BODY: ${response.body}");
 
@@ -79,7 +80,7 @@ class BookingService {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString("token");
 
-    final url = Uri.parse("https://banasthali-buddy.onrender.com/api/bookings/me/driver");
+    final url = Uri.parse("https://banasthali-buddy.onrender.com/api/bookings");
 
     if (token == null) {
       print("ERROR: TOKEN IS NULL");
@@ -97,7 +98,12 @@ class BookingService {
     print("RESPONSE BODY: ${response.body}");
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      List data = jsonDecode(response.body);
+
+      // only pending rides show to driver
+      return data
+          .where((ride) => ride["status"] == "PENDING")
+          .toList();
     } else {
       return [];
     }

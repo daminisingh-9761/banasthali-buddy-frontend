@@ -18,7 +18,8 @@ class BusMapScreen extends StatefulWidget {
 class _BusMapScreenState extends State<BusMapScreen> {
 
   MapController mapController = MapController();
-  LatLng busLocation = LatLng(26.399235, 75.881107);
+
+  LatLng busLocation = LatLng(26.400705, 75.877674);
 
   String baseUrl =
       "https://banasthali-buddy-backend.onrender.com/api/users/bus/location";
@@ -73,59 +74,67 @@ class _BusMapScreenState extends State<BusMapScreen> {
 
   void setInitialLocation(){
 
+    /// MAIN GATE → OLD MARKET
     if(widget.routeName == "Main Gate to Old Market"){
 
       routePoints = [
 
-        LatLng(26.399235, 75.881107),
-        LatLng(26.401200, 75.878900),
-        LatLng(26.402800, 75.876200),
-        LatLng(26.403900, 75.873900),
-        LatLng(26.405200, 75.870900),
-        LatLng(26.407613, 75.860832),
+        LatLng(26.400705, 75.877674), // Guest House
+        LatLng(26.401127, 75.876502), // Saudh Hostel
+        LatLng(26.401815, 75.875053), // AIM & ACT
+        LatLng(26.402122, 75.874294), // Vidya Mandir
+        LatLng(26.403147, 75.872037), // Vani Mandir
+        LatLng(26.403575, 75.870870), // Surya Mandir
+        LatLng(26.406205, 75.864842), // Sarda Mandir
+        LatLng(26.407123, 75.862140), // Khadi Bhandar
 
       ];
 
     }
 
+    /// OLD MARKET → MAIN GATE
     else if(widget.routeName == "Old Market to Main Gate"){
 
       routePoints = [
 
-        LatLng(26.407613, 75.860832),
-        LatLng(26.405200, 75.870900),
-        LatLng(26.403900, 75.873900),
-        LatLng(26.402800, 75.876200),
-        LatLng(26.401200, 75.878900),
-        LatLng(26.399235, 75.881107),
+        LatLng(26.407123, 75.862140),
+        LatLng(26.406205, 75.864842),
+        LatLng(26.403575, 75.870870),
+        LatLng(26.403147, 75.872037),
+        LatLng(26.402122, 75.874294),
+        LatLng(26.401815, 75.875053),
+        LatLng(26.401127, 75.876502),
+        LatLng(26.400705, 75.877674),
 
       ];
 
     }
 
+    /// HOSTEL AREA → ACADEMIC BLOCK
     else if(widget.routeName == "Hostel Area to Academic Block"){
 
       routePoints = [
 
-        LatLng(26.397180, 75.874902),
-        LatLng(26.399000, 75.875600),
-        LatLng(26.401000, 75.874900),
-        LatLng(26.403000, 75.873900),
-        LatLng(26.404159, 75.871488),
+        LatLng(26.397906, 75.875318), // Vasti Hostel
+        LatLng(26.398950, 75.875902), // Vasam Hostel
+        LatLng(26.401815, 75.875053), // AIM & ACT
+        LatLng(26.402122, 75.874294), // Vidya Mandir
+        LatLng(26.403147, 75.872037), // Vani Mandir
 
       ];
 
     }
 
+    /// ACADEMIC BLOCK → HOSTEL AREA
     else if(widget.routeName == "Academic Block to Hostel Area"){
 
       routePoints = [
 
-        LatLng(26.404159, 75.871488),
-        LatLng(26.403000, 75.873900),
-        LatLng(26.401000, 75.874900),
-        LatLng(26.399000, 75.875600),
-        LatLng(26.397180, 75.874902),
+        LatLng(26.403147, 75.872037),
+        LatLng(26.402122, 75.874294),
+        LatLng(26.401815, 75.875053),
+        LatLng(26.398950, 75.875902),
+        LatLng(26.397906, 75.875318),
 
       ];
 
@@ -189,7 +198,6 @@ class _BusMapScreenState extends State<BusMapScreen> {
 
     return Scaffold(
 
-      /// ✅ GREEN HEADER
       appBar: AppBar(
 
         backgroundColor: const Color(0xFF2F6F6D),
@@ -211,6 +219,8 @@ class _BusMapScreenState extends State<BusMapScreen> {
       ),
 
       body: FlutterMap(
+
+        mapController: mapController,
 
         options: MapOptions(
           initialCenter: busLocation,

@@ -79,6 +79,31 @@ class _BuyItemScreenState extends State<BuyItemScreen> {
 
   }
 
+  /// FIX: ensure full image URL
+  String getFullImageUrl(String? imageUrl){
+
+    if(imageUrl == null || imageUrl.isEmpty){
+
+      return "";
+
+    }
+
+    if(imageUrl.startsWith("http")){
+
+      return imageUrl;
+
+    }
+
+    if(!imageUrl.startsWith("/")){
+
+      imageUrl = "/$imageUrl";
+
+    }
+
+    return "https://banasthali-buddy.onrender.com$imageUrl";
+
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -263,6 +288,9 @@ class _BuyItemScreenState extends State<BuyItemScreen> {
                       final item =
                       filteredItems[index];
 
+                      final imageUrl =
+                      getFullImageUrl(item["imageUrl"]);
+
                       return Stack(
 
                         children: [
@@ -272,7 +300,6 @@ class _BuyItemScreenState extends State<BuyItemScreen> {
                             margin:
 
                             const EdgeInsets.only(
-
                                 bottom: 15),
 
                             padding:
@@ -319,13 +346,7 @@ class _BuyItemScreenState extends State<BuyItemScreen> {
 
                                   child:
 
-                                  item["imageUrl"] != null &&
-
-                                      item["imageUrl"]
-
-                                          .toString()
-
-                                          .isNotEmpty
+                                  imageUrl.isNotEmpty
 
                                       ? ClipRRect(
 
@@ -335,19 +356,15 @@ class _BuyItemScreenState extends State<BuyItemScreen> {
 
                                     child: Image.network(
 
-                                      "https://banasthali-buddy.onrender.com${item["imageUrl"]}",
+                                      imageUrl,
 
-                                      fit:
+                                      fit: BoxFit.cover,
 
-                                      BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
 
-                                      errorBuilder:
+                                        print("IMAGE ERROR: $error");
 
-                                          (context, error, stackTrace) {
-
-                                        return const Icon(
-
-                                            Icons.image);
+                                        return const Icon(Icons.broken_image);
 
                                       },
 
@@ -356,13 +373,11 @@ class _BuyItemScreenState extends State<BuyItemScreen> {
                                   )
 
                                       : const Icon(
-
                                       Icons.image),
 
                                 ),
 
                                 const SizedBox(
-
                                     width: 15),
 
                                 Expanded(

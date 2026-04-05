@@ -152,48 +152,85 @@ class _PostItemScreenState extends State<PostItemScreen> {
           content: Text("Please fill all required fields"),
         ),
       );
+
       return;
+
     }
 
     final prefs = await SharedPreferences.getInstance();
+
     String? token = prefs.getString("token");
 
     if (token == null) {
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("User not logged in")),
       );
+
       return;
-    }
-
-    bool success = await ApiService.postItem(
-      "",
-      itemNameController.text.trim(),
-      descriptionController.text.trim(),
-      priceController.text.trim(),
-      categoryController.text.trim(),
-      sellerPhoneController.text.trim(),
-      sellerHostelController.text.trim(),
-      sellerRoomController.text.trim(),
-      _itemImage,
-    );
-
-    if (!mounted) return;
-
-    if (success) {
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Item Posted Successfully")),
-      );
-
-      Navigator.pop(context);
-
-    } else {
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to post item")),
-      );
 
     }
+
+    try {
+
+      bool success = await ApiService.postItem(
+
+        token, // ✅ send token
+
+        itemNameController.text.trim(),
+
+        descriptionController.text.trim(),
+
+        priceController.text.trim(),
+
+        categoryController.text.trim().isEmpty
+            ? "General"
+            : categoryController.text.trim(),
+
+        sellerPhoneController.text.trim(),
+
+        sellerHostelController.text.trim(),
+
+        sellerRoomController.text.trim(),
+
+        _itemImage, // ✅ send image file
+
+      );
+
+      if (!mounted) return;
+
+      if (success) {
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Item Posted Successfully"),
+          ),
+        );
+
+        Navigator.pop(context);
+
+      } else {
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Failed to post item"),
+          ),
+        );
+
+      }
+
+    } catch (e) {
+
+      print("POST ITEM ERROR: $e");
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Error posting item"),
+        ),
+      );
+
+    }
+
   }
 
   @override
