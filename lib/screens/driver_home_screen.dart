@@ -28,6 +28,13 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
     super.initState();
     ApiService.pingServer();
     loadToken();
+
+
+    Future.doWhile(() async {
+      await Future.delayed(const Duration(seconds: 5));
+      await loadBookings();
+      return true;
+    });
   }
 
   Future<void> loadToken() async {
